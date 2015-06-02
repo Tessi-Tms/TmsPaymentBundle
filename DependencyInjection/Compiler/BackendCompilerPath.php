@@ -5,7 +5,7 @@
  * @license: MIT
  */
 
-namespace Tms\Bundle\StepBundle\DependencyInjection\Compiler;
+namespace Tms\Bundle\PaymentBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;

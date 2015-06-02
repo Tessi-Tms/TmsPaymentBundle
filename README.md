@@ -57,7 +57,7 @@ $ php app/console container:debug
 You'll get this result:
 ```sh
 ...
-TODO
+tms_payment.backend_registry  container Tms\Bundle\PaymentBundle\Backend\BackendRegistry
 ...
 ```
 
