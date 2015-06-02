@@ -1,0 +1,25 @@
+{
+    "name": "tms/payment-bundle",
+    "type": "symfony-bundle",
+    "description": "Symfony2 payment bundle ",
+    "keywords": ["bundle", "payment", "tessi"],
+    "homepage": "https://github.com/Tessi-Tms/TmsPaymentBundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "TESSI MARKETING",
+            "email": "contact@tessi.fr",
+            "homepage": "http://www.tessi.fr"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/framework-bundle": ">=2.3",
+        "twig/twig": "*",
+    },
+    "autoload": {
+        "psr-0": { "Tms\\Bundle\\PaymentBundle": "" }
+    },
+    "minimum-stability": "dev",
+    "target-dir": "Tms/Bundle/PaymentBundle"
+}
