@@ -36,7 +36,7 @@ public function registerBundles()
 {
     $bundles = array(
         // ...
-        new Tms\Bundle\TmsPaymentBundle(),
+        new Tms\Bundle\PaymentBundle\TmsPaymentBundle(),
     );
 }
 ```
