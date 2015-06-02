@@ -1,0 +1,4 @@
+tms_payment:
+    backends:
+        sogenactif: ~
+        paybox:     ~

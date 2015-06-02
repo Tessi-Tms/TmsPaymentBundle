@@ -1,0 +1,6 @@
+services:
+
+    # Registry
+
+    tms_payment.backend_registry:
+        class: Tms\Bundle\PaymentBundle\Backend\BackendRegistry
