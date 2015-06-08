@@ -3,4 +3,23 @@ services:
     # Registry
 
     tms_payment.backend_registry:
-        class: Tms\Bundle\PaymentBundle\Backend\BackendRegistry
+        class: Tms\Bundle\PaymentBundle\Backend\PaymentBackendRegistry
+        arguments: [%tms_payment.backends%]
+
+
+    # Backend
+
+    tms_payment.backend.sogenactif:
+        class: Tms\Bundle\PaymentBundle\Backend\SogenactifPaymentBackend
+        arguments:
+            - @kernel
+        tags:
+            -  { name: tms_payment.backend, alias: sogenactif }
+
+    tms_payment.backend.paybox:
+        class: Tms\Bundle\PaymentBundle\Backend\PayboxPaymentBackend
+        arguments:
+            - @kernel
+            - @twig
+        tags:
+            -  { name: tms_payment.backend, alias: paybox }

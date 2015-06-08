@@ -5,11 +5,13 @@
  * @license: MIT
  */
 
-namespace Tms\Bundle\StepBundle\Payment\Backend;
+namespace Tms\Bundle\PaymentBundle\Backend;
 
 use Symfony\Component\Process\Process;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Tms\Bundle\PaymentBundle\Model\Payment;
+use Tms\Bundle\PaymentBundle\Currency\CurrencyCode;
 
 class SogenactifPaymentBackend extends AbstractPaymentBackend
 {
@@ -23,12 +25,10 @@ class SogenactifPaymentBackend extends AbstractPaymentBackend
     /**
      * Constructor
      *
-     * @param array           $configuration Payment configuration.
-     * @param KernelInterface $kernel        The kernel.
+     * @param KernelInterface $kernel The kernel.
      */
-    public function __construct(array $configuration, KernelInterface $kernel)
+    public function __construct(KernelInterface $kernel)
     {
-        parent::__construct($configuration);
         $this->kernel = $kernel;
     }
 
@@ -37,13 +37,13 @@ class SogenactifPaymentBackend extends AbstractPaymentBackend
      *
      * @return string
      */
-    protected function getPathFile()
+    public function getPathFile()
     {
-        $pathfile = $this->configuration['parameters']['pathfile'];
+        $pathfile = $this->getConfigurationParameter('pathfile');
 
         if (null === $pathfile) {
             $pathfile = $this->kernel->locateResource(
-                '@TmsStepBundle/bin/sogenactif/param/pathfile'
+                '@TmsPaymentBundle/Resources/bin/sogenactif/param/pathfile'
             );
         }
 
@@ -58,7 +58,7 @@ class SogenactifPaymentBackend extends AbstractPaymentBackend
     protected function getRequestBinPath()
     {
         return $this->kernel->locateResource(
-             '@TmsStepBundle/bin/sogenactif/static/request'
+             '@TmsPaymentBundle/Resources/bin/sogenactif/static/request'
         );
     }
 
@@ -70,33 +70,25 @@ class SogenactifPaymentBackend extends AbstractPaymentBackend
     protected function getResponseBinPath()
     {
         return $this->kernel->locateResource(
-             '@TmsStepBundle/bin/sogenactif/static/response'
+             '@TmsPaymentBundle/Resources/bin/sogenactif/static/response'
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return 'sogenactif';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getPaymentContent(array $options)
+    public function getPaymentForm(array $parameters)
     {
         $shellOptions = array(
             'pathfile'               => $this->getPathFile(),
-            'automatic_response_url' => $options['automatic_response_url'],
-            'normal_return_url'      => $options['return_url'],
-            'cancel_return_url'      => $options['return_url'],
-            'merchant_id'            => $options['merchant_id'],
-            'merchant_country'       => $options['merchant_country'],
-            'amount'                 => $options['amount'],
-            'currency_code'          => $options['currency_code'],
-            'order_id'               => $options['order_id'],
+            'automatic_response_url' => $parameters['automatic_response_url'],
+            'normal_return_url'      => $parameters['return_url'],
+            'cancel_return_url'      => $parameters['return_url'],
+            'merchant_id'            => $parameters['merchant_id'],
+            'merchant_country'       => $parameters['merchant_country'],
+            'amount'                 => $parameters['amount'],
+            'currency_code'          => CurrencyCode::getNumericCode($parameters['currency_code']),
+            'order_id'               => $parameters['order_id'],
         );
 
         $args = implode(' ', array_map(
@@ -111,8 +103,9 @@ class SogenactifPaymentBackend extends AbstractPaymentBackend
         ));
         $process->run();
 
+
         list($_, $code, $error, $message) = explode("!", $process->getOutput());
-        if (0 !== $code) {
+        if ('0' !== $code) {
             return $error;
         }
 
@@ -122,10 +115,10 @@ class SogenactifPaymentBackend extends AbstractPaymentBackend
     /**
      * {@inheritdoc}
      */
-    public function getPaymentResults(Request $request)
+    protected function updatePayment(Payment $payment, Request $request)
     {
         if (!$request->request->has('DATA')) {
-            return null;
+            return $payment;
         }
 
         $shellOptions = array(
@@ -193,26 +186,26 @@ class SogenactifPaymentBackend extends AbstractPaymentBackend
             '_',
         );
 
-        $results = array_combine($keys, explode("!", $process->getOutput()));
-        unset($results['_']);
+        $raw = array_combine($keys, explode("!", $process->getOutput()));
+        unset($raw['_']);
+
+        // TODO: check amount !
+
+        $payment
+            ->setTransactionId($raw['transaction_id'])
+            ->setReferenceId($raw['order_id'])
+            ->setRaw($raw)
+        ;
 
         // Look at sogenactif documentation for the '17' response code return value.
-        if ($results['response_code'] == '17') {
-            return null;
+        if ($raw['response_code'] == '17') {
+            $payment->setState(Payment::STATE_CANCELED);
+        } elseif ('0' === $raw['code'] && '00' === $raw['response_code']) {
+            $payment->setState(Payment::STATE_APPROVED);
+        } else {
+            $payment->setState(Payment::STATE_FAILED);
         }
 
-        return $results;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isValidPayment(array $results)
-    {
-        if ('0' === $results['code'] && '00' === $results['response_code']) {
-            return true;
-        }
-
-        return false;
+        return $payment;
     }
 }

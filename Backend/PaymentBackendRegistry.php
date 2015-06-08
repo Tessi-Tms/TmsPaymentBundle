@@ -5,9 +5,9 @@
  * @license: MIT
  */
 
-namespace Tms\Bundle\StepBundle\Payment;
+namespace Tms\Bundle\PaymentBundle\Backend;
 
-class BackendRegistry implements BackendRegistryInterface
+class PaymentBackendRegistry implements PaymentBackendRegistryInterface
 {
     /**
      * @var BackendInterface[]
@@ -15,10 +15,30 @@ class BackendRegistry implements BackendRegistryInterface
     private $backends = array();
 
     /**
+     * @var array
+     */
+    private $configuration;
+
+    /**
+     * Constructor
+     *
+     * @param array $configuration The payment backends configuration.
+     */
+    public function __construct(array $configuration)
+    {
+        $this->configuration = $configuration;
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function setBackend($alias, BackendInterface $backend)
+    public function setBackend($alias, PaymentBackendInterface $backend)
     {
+        $backend->setName($alias);
+        if (isset($this->configuration[$alias])) {
+            $backend->setConfigurationParameters($this->configuration[$alias]['parameters']);
+        }
+
         $this->backends[$alias] = $backend;
 
         return $this;
@@ -44,10 +64,6 @@ class BackendRegistry implements BackendRegistryInterface
      */
     public function hasBackend($alias)
     {
-        if (!isset($this->backends[$alias])) {
-            return false;
-        }
-
-        return true;
+        return isset($this->backends[$alias]);
     }
 }

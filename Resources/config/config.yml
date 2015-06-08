@@ -1,4 +1,10 @@
 tms_payment:
     backends:
-        sogenactif: ~
-        paybox:     ~
+        sogenactif:
+            parameters:
+                pathfile: %payments.sogenactif_pathfile%
+        paybox:
+            parameters:
+                keyspath: %payments.paybox_keyspath%
+                web_servers:
+                    %payments.paybox_web_servers%

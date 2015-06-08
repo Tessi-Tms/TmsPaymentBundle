@@ -6,17 +6,17 @@
 
 namespace Tms\Bundle\PaymentBundle\Backend;
 
-interface BackendRegistryInterface
+interface PaymentBackendRegistryInterface
 {
     /**
      * Sets a payment backend identified by a alias.
      *
-     * @param string           $alias   The payment backend alias.
-     * @param BackendInterface $backend The payment backend.
+     * @param string                  $alias   The payment backend alias.
+     * @param PaymentBackendInterface $backend The payment backend.
      *
-     * @return BackendRegistryInterface
+     * @return PaymentBackendRegistryInterface
      */
-    public function setBackend($alias, BackendInterface $backend);
+    public function setBackend($alias, PaymentBackendInterface $backend);
 
     /**
      * Returns a payment backend by alias.

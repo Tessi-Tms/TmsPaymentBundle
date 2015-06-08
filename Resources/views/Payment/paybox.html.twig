@@ -1,0 +1,6 @@
+<form method="POST" action="{{ url }}">
+    {% for name,value in PBX %}
+        <input type="hidden" name="{{ name }}" value="{{ value }}" />
+    {% endfor %}
+    <input type="submit" value="Payer" />
+</form>

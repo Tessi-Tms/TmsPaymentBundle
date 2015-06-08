@@ -19,7 +19,7 @@ DEBUG!NO!
 # indiquer:
 # ------------------------------------------------------------------------
 #
-D_LOGO!/bundles/tmsstep/sogenactif/logo/!
+D_LOGO!/bundles/tmspayment/sogenactif/logo/!
 #
 # --------------------------------------------------------------------------
 #  Fichiers paramètres liés a l'api sogenactif paiement
@@ -27,7 +27,7 @@ D_LOGO!/bundles/tmsstep/sogenactif/logo/!
 #
 # certificat du commercant
 #
-F_CERTIFICATE!../vendor/tms/step-bundle/Tms/Bundle/StepBundle/bin/sogenactif/param/certif!
+F_CERTIFICATE!../vendor/tms/payment-bundle/Tms/Bundle/PaymentBundle/Resources/bin/sogenactif/param/certif!
 #
 # type du certificat
 #
@@ -35,11 +35,11 @@ F_CTYPE!php!
 #
 # fichier paramètre commercant
 #
-F_PARAM!../vendor/tms/step-bundle/Tms/Bundle/StepBundle/bin/sogenactif/param/parmcom!
+F_PARAM!../vendor/tms/payment-bundle/Tms/Bundle/PaymentBundle/Resources/bin/sogenactif/param/parmcom!
 #
 # fichier des paramètres sogenactif
 #
-F_DEFAULT!../vendor/tms/step-bundle/Tms/Bundle/StepBundle/bin/sogenactif/param/parmcom.sogenactif!
+F_DEFAULT!../vendor/tms/payment-bundle/Tms/Bundle/PaymentBundle/Resources/bin/sogenactif/param/parmcom.sogenactif!
 #
 #########################################################################
 # End of file
