@@ -196,7 +196,7 @@ class PayboxPaymentBackend extends AbstractPaymentBackend
         // TODO: check amount !
 
         $payment
-            ->setTransactionId($raw['authorisation_id'])
+            ->setTransactionId(isset($raw['authorisation_id']) ? $raw['authorisation_id'] : null)
             ->setReferenceId($raw['reference'])
             ->setRaw($raw)
         ;
