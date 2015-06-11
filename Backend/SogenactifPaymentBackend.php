@@ -194,6 +194,7 @@ class SogenactifPaymentBackend extends AbstractPaymentBackend
         $payment
             ->setTransactionId($raw['transaction_id'])
             ->setReferenceId($raw['order_id'])
+            ->setState(Payment::STATE_FAILED)
             ->setRaw($raw)
         ;
 
@@ -202,8 +203,6 @@ class SogenactifPaymentBackend extends AbstractPaymentBackend
             $payment->setState(Payment::STATE_CANCELED);
         } elseif ('0' === $raw['code'] && '00' === $raw['response_code']) {
             $payment->setState(Payment::STATE_APPROVED);
-        } else {
-            $payment->setState(Payment::STATE_FAILED);
         }
 
         return $payment;

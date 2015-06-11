@@ -26,10 +26,6 @@ class OrderPaymentController extends Controller
     {
         $requestData = $request->isMethod('POST') ? $request->request : $request->query;
         $logger = $this->container->get('logger');
-        $logger->info(sprintf('Payment server "%s" response: %s',
-            $backend_alias,
-            json_encode($requestData->all())
-        ));
 
         $paymentBackend = $this->container->get('tms_payment.backend_registry')
             ->getBackend($backend_alias)
@@ -39,9 +35,10 @@ class OrderPaymentController extends Controller
         $order = $crawler->go('order')->findOne('/orders', $order_id)->getData();
 
         if ('Q' != $order['processingState']) {
-            $logger->error(sprintf('The order %s must be at the state "Q" and not "%s"',
+            $logger->error(sprintf('The order %s must be at the state "Q" and not "%s". response: %s',
                 $order_id,
-                $order['processingState']
+                $order['processingState'],
+                json_encode($requestData->all())
             ));
 
             return new Response();
@@ -50,10 +47,20 @@ class OrderPaymentController extends Controller
         $payment = $paymentBackend->getPayment($request, $order['payment']);
         $patchOrder = array('payment' => $payment->toArray());
 
+        if ($payment->getState() == Payment::STATE_NEW) {
+            $logger->error(sprintf('Payment server "%s" response: %s',
+                $backend_alias,
+                json_encode($requestData->all())
+            ));
+
+            return new Response();
+        }
+
         if ($payment->getState() == Payment::STATE_APPROVED) {
             $patchOrder['processingState'] = 'N';
             $now = new \DateTime();
             $patchOrder['confirmedAt'] = $now->format(\DateTime::ISO8601);
+
         }
 
         $crawler

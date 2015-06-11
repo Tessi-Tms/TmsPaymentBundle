@@ -198,6 +198,7 @@ class PayboxPaymentBackend extends AbstractPaymentBackend
         $payment
             ->setTransactionId(isset($raw['authorisation_id']) ? $raw['authorisation_id'] : null)
             ->setReferenceId($raw['reference'])
+            ->setState(Payment::STATE_FAILED)
             ->setRaw($raw)
         ;
 
@@ -205,9 +206,7 @@ class PayboxPaymentBackend extends AbstractPaymentBackend
         if ('00001' === $code) {
             $payment->setState(Payment::STATE_CANCELED);
         } elseif ('00000' === $code) {
-            $payment
-                ->setState(Payment::STATE_APPROVED)
-            ;
+            $payment->setState(Payment::STATE_APPROVED);
         } elseif ('001' == substr($code, 0, 3)) {
             $payment->setState(Payment::STATE_FAILED);
         }
