@@ -60,7 +60,6 @@ class OrderPaymentController extends Controller
             $patchOrder['processingState'] = 'N';
             $now = new \DateTime();
             $patchOrder['confirmedAt'] = $now->format(\DateTime::ISO8601);
-
         }
 
         $crawler
