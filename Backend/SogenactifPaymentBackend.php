@@ -89,6 +89,7 @@ class SogenactifPaymentBackend extends AbstractPaymentBackend
             'amount'                 => $parameters['amount'],
             'currency_code'          => CurrencyCode::getNumericCode($parameters['currency_code']),
             'order_id'               => $parameters['order_id'],
+            'customer_email'         => $parameters['customer_email'],
         );
 
         $args = implode(' ', array_map(

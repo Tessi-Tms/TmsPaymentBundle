@@ -148,7 +148,7 @@ class PayboxPaymentBackend extends AbstractPaymentBackend
             'PBX_TOTAL'        => $parameters['amount'],
             'PBX_DEVISE'       => CurrencyCode::getNumericCode($parameters['currency_code']),
             'PBX_CMD'          => $parameters['order_id'],
-            'PBX_PORTEUR'      => 'test@tessi.fr',
+            'PBX_PORTEUR'      => $parameters['customer_email'],
             'PBX_REPONDRE_A'   => $parameters['automatic_response_url'],
             'PBX_RUF1'         => 'POST',
             'PBX_EFFECTUE'     => $parameters['return_url'],
