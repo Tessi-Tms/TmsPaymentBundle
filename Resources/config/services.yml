@@ -11,15 +11,18 @@ services:
 
     tms_payment.backend.sogenactif:
         class: Tms\Bundle\PaymentBundle\Backend\SogenactifPaymentBackend
-        arguments:
-            - @kernel
+        arguments: [@kernel]
         tags:
             -  { name: tms_payment.backend, alias: sogenactif }
 
+    tms_payment.backend.scellius:
+        class: Tms\Bundle\PaymentBundle\Backend\ScelliusPaymentBackend
+        arguments: [@kernel]
+        tags:
+            -  { name: tms_payment.backend, alias: scellius }
+
     tms_payment.backend.paybox:
         class: Tms\Bundle\PaymentBundle\Backend\PayboxPaymentBackend
-        arguments:
-            - @kernel
-            - @twig
+        arguments: [@kernel, @twig]
         tags:
             -  { name: tms_payment.backend, alias: paybox }

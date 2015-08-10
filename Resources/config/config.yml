@@ -3,6 +3,9 @@ tms_payment:
         sogenactif:
             parameters:
                 pathfile: %payments.sogenactif_pathfile%
+        scellius:
+            parameters:
+                pathfile: %payments.scellius_pathfile%
         paybox:
             parameters:
                 keyspath: %payments.paybox_keyspath%
