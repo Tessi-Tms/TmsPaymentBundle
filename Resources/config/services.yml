@@ -6,6 +6,9 @@ services:
         class: Tms\Bundle\PaymentBundle\Backend\PaymentBackendRegistry
         arguments: [%tms_payment.backends%]
 
+    tms_payment.callback_registry:
+        class: Tms\Bundle\PaymentBundle\Callback\PaymentCallbackRegistry
+
 
     # Backend
 
@@ -26,3 +29,18 @@ services:
         arguments: [@kernel, @twig]
         tags:
             -  { name: tms_payment.backend, alias: paybox }
+
+
+    # Callback
+
+    tms_payment.callback.update_order:
+        class: Tms\Bundle\PaymentBundle\Callback\UpdateOrderPaymentCallback
+        arguments: [@tms_rest_client.hypermedia.crawler]
+        tags:
+            -   { name: tms_payment.callback, alias: update_order }
+
+    tms_payment.callback.create_participation:
+        class: Tms\Bundle\PaymentBundle\Callback\CreateParticipationPaymentCallback
+        arguments: [@tms_rest_client.hypermedia.crawler]
+        tags:
+            -   { name: tms_payment.callback, alias: create_participation }

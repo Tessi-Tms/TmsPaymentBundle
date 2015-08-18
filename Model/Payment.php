@@ -56,20 +56,18 @@ class Payment
     protected $raw;
 
     /**
-     * Constructor
-     *
-     * @param array $data The default data.
+     * The constructor
      */
-    public function __construct($data = array())
+    public function __construct()
     {
-        $this->transactionId = isset($data['transactionId']) ? $data['transactionId'] : null;
-        $this->referenceId   = isset($data['referenceId']) ? $data['referenceId'] : null;
-        $this->amount        = isset($data['amount']) ? $data['amount'] : 0;
-        $this->currencyCode  = isset($data['currencyCode']) ? $data['currencyCode'] : null;
-        $this->createdAt     = isset($data['createdAt']) ? \DateTime::createFromFormat(\DateTime::ISO8601, $data['createdAt']) : new \DateTime('now');
-        $this->backendAlias  = isset($data['backendAlias']) ? $data['backendAlias'] : null;
-        $this->state         = isset($data['state']) ? $data['state'] : self::STATE_NEW;
-        $this->raw           = isset($data['raw']) ? $data['raw'] : array();
+        $this->transactionId = null;
+        $this->referenceId   = null;
+        $this->amount        = 0;
+        $this->currencyCode  = null;
+        $this->createdAt     = new \DateTime('now');
+        $this->backendAlias  = null;
+        $this->state         = self::STATE_NEW;
+        $this->raw           = array();
     }
 
     /**
@@ -200,12 +198,16 @@ class Payment
     /**
      * Set payment created at.
      *
-     * @param DateTime $createdAt
+     * @param DateTime|string $createdAt
      *
      * @return Payment
      */
-    public function setCreatedAt(\DateTime $createdAt)
+    public function setCreatedAt($createdAt)
     {
+        if (is_string($createdAt)) {
+            $createdAt = \DateTime::createFromFormat(\DateTime::ISO8601, $createdAt);
+        }
+
         $this->createdAt = $createdAt;
 
         return $this;
