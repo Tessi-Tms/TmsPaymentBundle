@@ -34,9 +34,16 @@ class PaymentController extends Controller
             throw new HttpException(400, 'Callbacks parameter is missing');
         }
 
+        $callbacks = is_array($requestData->get('callbacks')) ?
+            $requestData->get('callbacks') :
+            json_decode(base64_decode($requestData->get('callbacks')), true)
+        ;
+
         $payment = $paymentBackend->getPayment($request);
 
-        foreach ($requestData->get('callbacks') as $callback => $parameters) {
+        $response = new Response();
+
+        foreach ($callbacks as $callback => $parameters) {
             try {
                 $this->container->get('tms_payment.callback_registry')
                     ->getCallback($callback)
@@ -44,9 +51,15 @@ class PaymentController extends Controller
                 ;
             } catch (\Exception $e) {
                 $this->container->get('logger')->error($e->getMessage());
+                $response
+                    ->setStatusCode(500, $e->getMessage())
+                    ->setContent($e->getMessage())
+                ;
+
+                return $response;
             }
         }
 
-        return new Response();
+        return $response;
     }
 }

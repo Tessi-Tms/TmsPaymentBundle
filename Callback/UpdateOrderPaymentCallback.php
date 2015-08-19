@@ -40,10 +40,9 @@ class UpdateOrderPaymentCallback implements PaymentCallbackInterface
         ;
 
         if ('Q' != $order['processingState']) {
-            throw new \RuntimeException(sprintf('The order %s must be at the state "Q" and not "%s". request: %s',
+            throw new \RuntimeException(sprintf('The order %s must be at the state "Q" and not "%s"',
                 $parameters['order_id'],
-                $order['processingState'],
-                json_encode($requestData->all())
+                $order['processingState']
             ));
         }
 
@@ -51,9 +50,8 @@ class UpdateOrderPaymentCallback implements PaymentCallbackInterface
         $patchOrder = array('payment' => $payment->toArray());
 
         if ($payment->getState() == Payment::STATE_NEW) {
-            throw new \RuntimeException(sprintf('The payment "%s" still in the NEW state: %s',
-                $backend_alias,
-                json_encode($requestData->all())
+            throw new \RuntimeException(sprintf('The payment "%s" is still in the NEW state',
+                $backend_alias
             ));
         }
 
