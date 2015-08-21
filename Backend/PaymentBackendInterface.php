@@ -47,11 +47,10 @@ interface PaymentBackendInterface
      * Returns the payment.
      *
      * @param Request $request The HTTP request returned by the bank.
-     * @param array   $data    The default payment data.
      *
      * @return Tms\Bundle\PaymentBundle\Model\Payment
      */
-    public function getPayment(Request $request, $data = array());
+    public function getPayment(Request $request);
 
     /**
      * Returns the HTML payment form.

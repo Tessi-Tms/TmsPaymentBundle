@@ -1,2 +1,2 @@
 payments:
-    resource:   "@TmsPaymentBundle/Controller/Payments"
+    resource:   "@TmsPaymentBundle/Controller"

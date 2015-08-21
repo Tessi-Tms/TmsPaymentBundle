@@ -7,10 +7,11 @@
 
 namespace Tms\Bundle\PaymentBundle\Callback;
 
-use Tms\Bundle\RestClientBundle\Hypermedia\Crawling\CrawlerInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Tms\Bundle\PaymentBundle\Model\Payment;
+use Tms\Bundle\RestClientBundle\Hypermedia\Crawling\CrawlerInterface;
 
-class UpdateOrderPaymentCallback implements PaymentCallbackInterface
+class UpdateOrderPaymentCallback extends AbstractPaymentCallback
 {
     /**
      * @var CrawlerInterface
@@ -30,7 +31,20 @@ class UpdateOrderPaymentCallback implements PaymentCallbackInterface
     /**
      * {@inheritdoc}
      */
-    public function execute(Payment $payment, $parameters)
+    protected function setDefaultParameters(OptionsResolverInterface $resolver)
+    {
+        $resolver
+            ->setRequired(array('order_id'))
+            ->setAllowedTypes(array(
+                'order_id' => array('string')
+            ))
+        ;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doExecute(Payment $payment, array $parameters = array())
     {
         $order = $this
             ->crawler
@@ -40,6 +54,8 @@ class UpdateOrderPaymentCallback implements PaymentCallbackInterface
         ;
 
         if ('Q' != $order['processingState']) {
+            //
+            return true;
             throw new \RuntimeException(sprintf('The order %s must be at the state "Q" and not "%s"',
                 $parameters['order_id'],
                 $order['processingState']
@@ -47,12 +63,11 @@ class UpdateOrderPaymentCallback implements PaymentCallbackInterface
         }
 
         $this->initPayment($payment, $order);
+        // $payment->setState(Payment::STATE_APPROVED);
         $patchOrder = array('payment' => $payment->toArray());
 
         if ($payment->getState() == Payment::STATE_NEW) {
-            throw new \RuntimeException(sprintf('The payment "%s" is still in the NEW state',
-                $backend_alias
-            ));
+            throw new \RuntimeException('The payment is still in the NEW state');
         }
 
         if ($payment->getState() == Payment::STATE_APPROVED) {

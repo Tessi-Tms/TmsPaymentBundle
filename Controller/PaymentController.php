@@ -1,6 +1,6 @@
 <?php
 
-namespace Tms\Bundle\PaymentBundle\Controller\Payments;
+namespace Tms\Bundle\PaymentBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -45,12 +45,20 @@ class PaymentController extends Controller
 
         foreach ($callbacks as $callback => $parameters) {
             try {
-                $this->container->get('tms_payment.callback_registry')
+                $this
+                    ->container
+                    ->get('tms_payment.callback_registry')
                     ->getCallback($callback)
                     ->execute($payment, $parameters)
                 ;
             } catch (\Exception $e) {
-                $this->container->get('logger')->error($e->getMessage());
+                $this->container->get('logger')->error(
+                    $e->getMessage(),
+                    array(
+                        'backend' => $backend_alias,
+                        'request' => $request,
+                    )
+                );
                 $response
                     ->setStatusCode(500, $e->getMessage())
                     ->setContent($e->getMessage())
