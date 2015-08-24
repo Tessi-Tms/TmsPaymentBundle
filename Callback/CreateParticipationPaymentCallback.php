@@ -52,7 +52,22 @@ class CreateParticipationPaymentCallback extends AbstractPaymentCallback
      */
     protected function doExecute(array $order, Payment $payment, array $parameters = array())
     {
-        $participation = $this->buildParticipationData($order, $parameters);
+        $participation = array(
+            'source'           => $order['source'],
+            'order'            => $order['id'],
+            'operation'        => $parameters['operation'],
+            'offer'            => $parameters['offer'],
+            'customer'         => $order['customer'],
+            'user'             => $order['user'],
+            'status'           => $parameters['status'],
+            'processing_state' => $parameters['processing_state'],
+            'raw_source_data'  => $order['rawSourceData'],
+            'raw_data'         => json_encode($order['rawData'], JSON_UNESCAPED_UNICODE),
+            'raw_controls'     => json_encode($parameters['raw_controls'], JSON_UNESCAPED_UNICODE),
+            'raw_eligibility'  => json_encode($parameters['raw_eligibility'], JSON_UNESCAPED_UNICODE),
+            'raw_benefit'      => json_encode($parameters['raw_benefit'], JSON_UNESCAPED_UNICODE),
+            'search'           => json_encode($parameters['search'], JSON_UNESCAPED_UNICODE),
+        );
 
         $result = $this
             ->crawler
@@ -73,61 +88,5 @@ class CreateParticipationPaymentCallback extends AbstractPaymentCallback
                 array('participation' => $result['id'])
             )
         ;
-
-        var_dump(array(
-            'order' => $order['id'],
-            'participation' => $result['id']
-        ));
-    }
-
-    /**
-     * Build participation data
-     *
-     * @param array $order
-     * @param array $parameters
-     *
-     * @return array
-     */
-    protected function buildParticipationData(array $order, array $parameters = array())
-    {
-        $data = array();
-        /*
-        foreach ($navigator->getFlow()->getData()->getAll() as $stepData) {
-            if (null === $stepData['data']) {
-                continue;
-            }
-
-            foreach ($stepData['data'] as $k => $v) {
-                if ('__' !== substr($k, 0, 2)) {
-                    if ($v instanceof \Tms\Bundle\MediaClientBundle\Model\Media) {
-                        $stepData['data'][$k] = $v->getPublicData();
-                    } elseif ($v instanceof \DateTime) {
-                        $stepData['data'][$k] = $v->format(\DateTime::ISO8601);
-                    }
-                } else {
-                    unset($stepData['data'][$k]);
-                }
-            }
-
-            $data = array_merge_recursive($data, $stepData);
-        }
-        */
-
-        return array(
-            'source'           => $order['source'],
-            'order'            => $order['id'],
-            'operation'        => $parameters['operation'],
-            'offer'            => $parameters['offer'],
-            'customer'         => $order['customer'],
-            'user'             => $order['user'],
-            'status'           => $parameters['status'],
-            'processing_state' => $parameters['processing_state'],
-            'raw_source_data'  => $order['rawSourceData'],
-            'raw_data'         => json_encode($data, JSON_UNESCAPED_UNICODE),
-            'raw_controls'     => json_encode($parameters['raw_controls'], JSON_UNESCAPED_UNICODE),
-            'raw_eligibility'  => json_encode($parameters['raw_eligibility'], JSON_UNESCAPED_UNICODE),
-            'raw_benefit'      => json_encode($parameters['raw_benefit'], JSON_UNESCAPED_UNICODE),
-            'search'           => json_encode($parameters['search'], JSON_UNESCAPED_UNICODE),
-        );
     }
 }
