@@ -31,44 +31,20 @@ class UpdateOrderPaymentCallback extends AbstractPaymentCallback
     /**
      * {@inheritdoc}
      */
-    protected function setDefaultParameters(OptionsResolverInterface $resolver)
+    protected function doExecute(array $order, Payment $payment, array $parameters = array())
     {
-        $resolver
-            ->setRequired(array('order_id'))
-            ->setAllowedTypes(array(
-                'order_id' => array('string')
-            ))
-        ;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function doExecute(Payment $payment, array $parameters = array())
-    {
-        $order = $this
-            ->crawler
-            ->go('order')
-            ->findOne('/orders', $parameters['order_id'])
-            ->getData()
-        ;
-
         if ('Q' != $order['processingState']) {
-            //
-            return true;
             throw new \RuntimeException(sprintf('The order %s must be at the state "Q" and not "%s"',
                 $parameters['order_id'],
                 $order['processingState']
             ));
         }
 
-        $this->initPayment($payment, $order);
-        // $payment->setState(Payment::STATE_APPROVED);
-        $patchOrder = array('payment' => $payment->toArray());
-
         if ($payment->getState() == Payment::STATE_NEW) {
-            throw new \RuntimeException('The payment is still in the NEW state');
+            //throw new \RuntimeException('The payment is still in the NEW state');
         }
+
+        $patchOrder = array('payment' => $payment->toArray());
 
         if ($payment->getState() == Payment::STATE_APPROVED) {
             $patchOrder['processingState'] = 'N';
@@ -80,27 +56,10 @@ class UpdateOrderPaymentCallback extends AbstractPaymentCallback
             ->crawler
             ->go('order')
             ->execute(
-                sprintf('/orders/%s', $parameters['order_id']),
+                sprintf('/orders/%s', $order['id']),
                 'PATCH',
                 $patchOrder
             )
         ;
-    }
-
-    /**
-     * Init payment
-     *
-     * @param Payment $payment
-     * @param array   $order
-     */
-    protected function initPayment(Payment & $payment, array $order = null)
-    {
-        $rc = new \ReflectionClass($payment);
-        foreach ($order['payment'] as $k => $v) {
-            $setter = sprintf('set%s', ucfirst($k));
-            if ($rc->hasMethod($setter)) {
-                call_user_func(array($payment, $setter), $v);
-            }
-        }
     }
 }

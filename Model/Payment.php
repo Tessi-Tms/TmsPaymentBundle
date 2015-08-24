@@ -57,17 +57,21 @@ class Payment
 
     /**
      * The constructor
+     *
+     * @param array $data The default data.
      */
-    public function __construct()
+    public function __construct(array $data = array())
     {
-        $this->transactionId = null;
-        $this->referenceId   = null;
-        $this->amount        = 0;
-        $this->currencyCode  = null;
-        $this->createdAt     = new \DateTime('now');
-        $this->backendAlias  = null;
-        $this->state         = self::STATE_NEW;
-        $this->raw           = array();
+        $this
+            ->setTransactionId(isset($data['transactionId']) ? $data['transactionId'] : null)
+            ->setReferenceId(isset($data['referenceId']) ? $data['referenceId'] : null)
+            ->setAmount(isset($data['amount']) ? $data['amount'] : 0)
+            ->setCurrencyCode(isset($data['currencyCode']) ? $data['currencyCode'] : null)
+            ->setCreatedAt(isset($data['createdAt']) ? $data['createdAt'] : new \DateTime('now'))
+            ->setBackendAlias(isset($data['backendAlias']) ? $data['backendAlias'] : null)
+            ->setState(isset($data['state']) ? $data['state'] : self::STATE_NEW)
+            ->setRaw(isset($data['raw']) ? $data['raw'] : array())
+        ;
     }
 
     /**

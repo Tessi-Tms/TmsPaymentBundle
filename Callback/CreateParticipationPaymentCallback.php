@@ -35,7 +35,7 @@ class CreateParticipationPaymentCallback extends AbstractPaymentCallback
     protected function setDefaultParameters(OptionsResolverInterface $resolver)
     {
         $resolver
-            ->setRequired(array('order_id', 'operation', 'offer',))
+            ->setRequired(array('operation', 'offer'))
             ->setDefaults(array(
                 'status'           => 'unknown',
                 'processing_state' => 'N',
@@ -50,24 +50,12 @@ class CreateParticipationPaymentCallback extends AbstractPaymentCallback
     /**
      * {@inheritdoc}
      */
-    protected function doExecute(Payment $payment, array $parameters = array())
+    protected function doExecute(array $order, Payment $payment, array $parameters = array())
     {
-        $order = $this
+        $participation = $this->buildParticipationData($order, $parameters);
+
+        $result = $this
             ->crawler
-            ->go('order')
-            ->findOne('/orders', $parameters['order_id'])
-            ->getData()
-        ;
-
-        $parameters['source']          = $order['source'];
-        $parameters['customer']        = $order['customer'];
-        $parameters['user']            = $order['user'];
-        $parameters['raw_source_data'] = $order['rawSourceData'];
-
-        $participation = $this->buildParticipationData($parameters);
-
-        var_dump($order, $participation); die;
-        $result = $this->crawler
             ->go('participation')
             ->execute(
                 '/participations',
@@ -80,21 +68,27 @@ class CreateParticipationPaymentCallback extends AbstractPaymentCallback
             ->crawler
             ->go('order')
             ->execute(
-                sprintf('/orders/%s', $parameters['order_id']),
+                sprintf('/orders/%s', $order['id']),
                 'PATCH',
                 array('participation' => $result['id'])
             )
         ;
+
+        var_dump(array(
+            'order' => $order['id'],
+            'participation' => $result['id']
+        ));
     }
 
     /**
      * Build participation data
      *
+     * @param array $order
      * @param array $parameters
      *
      * @return array
      */
-    protected function buildParticipationData(array $parameters = array())
+    protected function buildParticipationData(array $order, array $parameters = array())
     {
         $data = array();
         /*
@@ -120,15 +114,15 @@ class CreateParticipationPaymentCallback extends AbstractPaymentCallback
         */
 
         return array(
-            'source'           => $parameters['source'],
-            'order'            => $parameters['order_id'],
+            'source'           => $order['source'],
+            'order'            => $order['id'],
             'operation'        => $parameters['operation'],
             'offer'            => $parameters['offer'],
-            'customer'         => $parameters['customer'],
-            'user'             => $parameters['user'],
+            'customer'         => $order['customer'],
+            'user'             => $order['user'],
             'status'           => $parameters['status'],
             'processing_state' => $parameters['processing_state'],
-            'raw_source_data'  => $parameters['raw_source_data'],
+            'raw_source_data'  => $order['rawSourceData'],
             'raw_data'         => json_encode($data, JSON_UNESCAPED_UNICODE),
             'raw_controls'     => json_encode($parameters['raw_controls'], JSON_UNESCAPED_UNICODE),
             'raw_eligibility'  => json_encode($parameters['raw_eligibility'], JSON_UNESCAPED_UNICODE),

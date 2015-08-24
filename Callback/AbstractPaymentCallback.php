@@ -18,24 +18,29 @@ abstract class AbstractPaymentCallback implements PaymentCallbackInterface
      *
      * @param OptionsResolverInterface $resolver
      */
-    abstract protected function setDefaultParameters(OptionsResolverInterface $resolver);
+    protected function setDefaultParameters(OptionsResolverInterface $resolver)
+    {
+        return;
+    }
 
-    /**
-     * Do execute action.
-     *
-     * @param Payment $payment    The payment.
-     * @param array   $parameters The resolved parameters.
-     */
-    abstract protected function doExecute(Payment $payment, array $parameters = array());
 
     /**
      * {@inheritdoc}
      */
-    public function execute(Payment $payment, array $parameters = array())
+    public function execute(array $order, Payment $payment, array $parameters = array())
     {
         $resolver = new OptionsResolver();
         $this->setDefaultParameters($resolver);
 
-        return $this->doExecute($payment, $resolver->resolve($parameters));
+        return $this->doExecute($order, $payment, $resolver->resolve($parameters));
     }
+
+    /**
+     * Do execute action.
+     *
+     * @param array   $order      The order.
+     * @param Payment $payment    The payment.
+     * @param array   $parameters The resolved parameters.
+     */
+    abstract protected function doExecute(array $order, Payment $payment, array $parameters = array());
 }

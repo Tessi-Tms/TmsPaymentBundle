@@ -90,25 +90,4 @@ abstract class AbstractPaymentBackend implements PaymentBackendInterface
 
         return $this->parameters[$key];
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getPayment(Request $request)
-    {
-        $payment = new Payment();
-        $payment->setBackendAlias($this->getName());
-
-        return $this->updatePayment($payment, $request);
-    }
-
-    /**
-     * Update payment
-     *
-     * @param Payment $payment The payment.
-     * @param Request $request The HTTP request.
-     *
-     * @return Payment
-     */
-    abstract protected function updatePayment(Payment $payment, Request $request);
 }

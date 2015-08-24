@@ -184,16 +184,14 @@ class PayboxPaymentBackend extends AbstractPaymentBackend
     /**
      * {@inheritdoc}
      */
-    protected function updatePayment(Payment $payment, Request $request)
+    public function doPayment(Request $request, Payment & $payment)
     {
         $requestData = $request->isMethod('POST') ? $request->request : $request->query;
         if (!$requestData->has('error')) {
-            return $payment;
+            return false;
         }
         $raw  = $requestData->all();
         $code = $raw['error'];
-
-        // TODO: check amount !
 
         $payment
             ->setTransactionId(isset($raw['authorisation_id']) ? $raw['authorisation_id'] : null)
@@ -211,6 +209,6 @@ class PayboxPaymentBackend extends AbstractPaymentBackend
             $payment->setState(Payment::STATE_FAILED);
         }
 
-        return $payment;
+        return true;
     }
 }

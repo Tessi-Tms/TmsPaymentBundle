@@ -98,7 +98,7 @@ abstract class SipsPaymentBackend extends AbstractPaymentBackend
         );
 
         $args = implode(' ', array_map(
-            function ($k, $v) { return sprintf('%s=%s', $k, $v); },
+            function ($k, $v) { return sprintf('%s="%s"', $k, $v); },
             array_keys($shellOptions),
             $shellOptions
         ));
@@ -108,7 +108,6 @@ abstract class SipsPaymentBackend extends AbstractPaymentBackend
             $args
         ));
         $process->run();
-
 
         list($_, $code, $error, $message) = explode("!", $process->getOutput());
         if ('0' !== $code) {
@@ -121,10 +120,10 @@ abstract class SipsPaymentBackend extends AbstractPaymentBackend
     /**
      * {@inheritdoc}
      */
-    protected function updatePayment(Payment $payment, Request $request)
+    public function doPayment(Request $request, Payment & $payment)
     {
         if (!$request->request->has('DATA')) {
-            return $payment;
+            return false;
         }
 
         $shellOptions = array(
@@ -211,6 +210,6 @@ abstract class SipsPaymentBackend extends AbstractPaymentBackend
             $payment->setState(Payment::STATE_APPROVED);
         }
 
-        return $payment;
+        return true;
     }
 }

@@ -14,8 +14,9 @@ interface PaymentCallbackInterface
     /**
      * Executed on callback
      *
+     * @param array   $order      The order.
      * @param Payment $payment    The payment.
      * @param array   $parameters The parameters to use.
      */
-    public function execute(Payment $payment, array $parameters = array());
+    public function execute(array $order, Payment $payment, array $parameters = array());
 }

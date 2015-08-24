@@ -8,6 +8,7 @@
 namespace Tms\Bundle\PaymentBundle\Backend;
 
 use Symfony\Component\HttpFoundation\Request;
+use Tms\Bundle\PaymentBundle\Model\Payment;
 
 interface PaymentBackendInterface
 {
@@ -44,13 +45,14 @@ interface PaymentBackendInterface
     public function getConfigurationParameters();
 
     /**
-     * Returns the payment.
+     * Do the payment process
      *
-     * @param Request $request The HTTP request returned by the bank.
+     * @param Request $request The HTTP request.
+     * @param Payment $payment The payment.
      *
-     * @return Tms\Bundle\PaymentBundle\Model\Payment
+     * @return boolean
      */
-    public function getPayment(Request $request);
+    public function doPayment(Request $request, Payment & $payment);
 
     /**
      * Returns the HTML payment form.
