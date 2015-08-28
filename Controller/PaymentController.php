@@ -57,7 +57,7 @@ class PaymentController extends Controller
         $response = new Response();
 
         foreach ($callbacks as $callback => $parameters) {
-            if (null === $parameters) {
+            if (null === $parameters || '' == $parameters) {
                 $parameters = array();
             }
 
