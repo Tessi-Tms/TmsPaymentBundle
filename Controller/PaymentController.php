@@ -25,25 +25,20 @@ class PaymentController extends Controller
      */
     public function autoResponseAction(Request $request, $backend_alias)
     {
-        $requestData = $request->isMethod('POST') ? $request->request : $request->query;
-
         $paymentBackend = $this->container->get('tms_payment.backend_registry')
             ->getBackend($backend_alias)
         ;
 
-        if (!$requestData->has('order_id')) {
+        $order_id = $request->get('order_id');
+        if (null === $order_id) {
             throw new HttpException(400, 'order_id parameter is missing');
         }
-        $order_id = $requestData->get('order_id');
 
-        if (!$requestData->has('callbacks')) {
+        $callbacks = $request->get('callbacks');
+        if (null === $callbacks) {
             throw new HttpException(400, 'Callbacks parameter is missing');
         }
-
-        $callbacks = is_array($requestData->get('callbacks')) ?
-            $requestData->get('callbacks') :
-            json_decode(base64_decode($requestData->get('callbacks')), true)
-        ;
+        $callbacks = is_array($callbacks) ? $callbacks : json_decode(base64_decode($callbacks), true);
 
         $order = $this
             ->container
