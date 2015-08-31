@@ -39,8 +39,6 @@ class CreateParticipationPaymentCallback extends AbstractPaymentCallback
             ->setDefaults(array(
                 'status'           => 'unknown',
                 'processing_state' => 'N',
-                'raw_controls'     => array(),
-                'raw_eligibility'  => array(),
                 'raw_benefit'      => array(),
                 'search'           => array(),
             ))
@@ -63,8 +61,6 @@ class CreateParticipationPaymentCallback extends AbstractPaymentCallback
             'processing_state' => $parameters['processing_state'],
             'raw_source_data'  => $order['rawSourceData'],
             'raw_data'         => $order['rawData'],
-            'raw_controls'     => json_encode($parameters['raw_controls'], JSON_UNESCAPED_UNICODE),
-            'raw_eligibility'  => json_encode($parameters['raw_eligibility'], JSON_UNESCAPED_UNICODE),
             'raw_benefit'      => json_encode($parameters['raw_benefit'], JSON_UNESCAPED_UNICODE),
             'search'           => json_encode($parameters['search'], JSON_UNESCAPED_UNICODE),
         );
