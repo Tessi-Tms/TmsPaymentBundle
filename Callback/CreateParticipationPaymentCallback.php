@@ -46,6 +46,8 @@ class CreateParticipationPaymentCallback extends AbstractPaymentCallback
             ))
             ->setNormalizers(array(
                 'raw_benefit' => function(Options $options, $value) {
+                    $value = is_string($value) ? json_decode($value, true) : $value;
+
                     if (!empty($value) || empty($options['benefits'])) {
                         return $value;
                     }
