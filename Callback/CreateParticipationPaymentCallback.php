@@ -39,7 +39,7 @@ class CreateParticipationPaymentCallback extends AbstractPaymentCallback
             ->setDefaults(array(
                 'status'           => 'unknown',
                 'processing_state' => 'N',
-                'raw_benefit'      => array(),
+                'benefits'         => array(),
                 'search'           => array(),
             ))
         ;
@@ -50,6 +50,44 @@ class CreateParticipationPaymentCallback extends AbstractPaymentCallback
      */
     protected function doExecute(array $order, Payment $payment, array $parameters = array())
     {
+        $rawBenefit = array();
+        if (!empty($parameters['benefits'])) {
+            $offer = $this
+                ->crawler
+                ->go('operation')
+                ->execute(
+                    sprintf('/offers/%s', $parameters['offer']),
+                    'GET'
+                )
+            ;
+
+            $rawBenefit = array(
+                "benefits" => array(),
+                "history" => array()
+            );
+
+            foreach ($offer['benefits'] as $benefit) {
+
+                if (in_array($benefit['id'], $parameters['benefits'])) {
+                    $rawBenefit['benefits'][] = array(
+                        "id"             => $benefit['position'],
+                        "category"       => $benefit['category'],
+                        "deliveryMethod" => $benefit['deliveryMethod'],
+                        "unit"           => $benefit['unit'],
+                        "unitScale"      => $benefit['unitScale'],
+                        "quantity"       => $benefit['quantity'],
+                        "raw"            => $benefit['options'],
+                    );
+
+                    $rawBenefit['history'][] = array(
+                        "id"               => $benefit['position'],
+                        "processingState"  => $parameters['processing_state'],
+                        "date"             => date('Y-m-d\TH:i:sO')
+                    );
+                }
+            }
+        }
+
         $participation = array(
             'source'           => $order['source'],
             'order'            => $order['id'],
@@ -61,7 +99,7 @@ class CreateParticipationPaymentCallback extends AbstractPaymentCallback
             'processing_state' => $parameters['processing_state'],
             'raw_source_data'  => $order['rawSourceData'],
             'raw_data'         => $order['rawData'],
-            'raw_benefit'      => json_encode($parameters['raw_benefit'], JSON_UNESCAPED_UNICODE),
+            'raw_benefit'      => json_encode($rawBenefit, JSON_UNESCAPED_UNICODE),
             'search'           => json_encode($parameters['search'], JSON_UNESCAPED_UNICODE),
         );
 
