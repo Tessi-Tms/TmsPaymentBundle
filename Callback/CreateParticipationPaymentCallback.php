@@ -59,6 +59,7 @@ class CreateParticipationPaymentCallback extends AbstractPaymentCallback
                     sprintf('/offers/%s', $parameters['offer']),
                     'GET'
                 )
+                ->getData()
             ;
 
             $rawBenefit = array(
@@ -71,12 +72,12 @@ class CreateParticipationPaymentCallback extends AbstractPaymentCallback
                 if (in_array($benefit['id'], $parameters['benefits'])) {
                     $rawBenefit['benefits'][] = array(
                         "id"             => $benefit['position'],
-                        "category"       => $benefit['category'],
-                        "deliveryMethod" => $benefit['deliveryMethod'],
-                        "unit"           => $benefit['unit'],
+                        "category"       => $benefit['category']['name'],
+                        "deliveryMethod" => $benefit['deliveryMethod']['name'],
+                        "unit"           => $benefit['unit']['name'],
                         "unitScale"      => $benefit['unitScale'],
                         "quantity"       => $benefit['quantity'],
-                        "raw"            => $benefit['options'],
+                        "raw"            => $benefit['options'] ? $benefit['options'] : array(),
                     );
 
                     $rawBenefit['history'][] = array(
