@@ -45,6 +45,9 @@ class CreateParticipationPaymentCallback extends AbstractPaymentCallback
                 'search'           => array(),
             ))
             ->setNormalizers(array(
+                'benefits'    => function (Options $options, $value) {
+                    return is_string($value) ? json_decode($value, true) : $value;
+                },
                 'raw_benefit' => function(Options $options, $value) {
                     $value = is_string($value) ? json_decode($value, true) : $value;
 
@@ -81,7 +84,7 @@ class CreateParticipationPaymentCallback extends AbstractPaymentCallback
 
                             $rawBenefit['history'][] = array(
                                 "id"               => $benefit['position'],
-                                "processingState"  => $parameters['processing_state'],
+                                "processingState"  => $options['processing_state'],
                                 "date"             => date('Y-m-d\TH:i:sO')
                             );
                         }
