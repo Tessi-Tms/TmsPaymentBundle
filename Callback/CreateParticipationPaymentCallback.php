@@ -113,7 +113,7 @@ class CreateParticipationPaymentCallback extends AbstractPaymentCallback
             'raw_source_data'  => $order['rawSourceData'],
             'raw_data'         => $order['rawData'],
             'raw_benefit'      => json_encode($parameters['raw_benefit'], JSON_UNESCAPED_UNICODE),
-            'search'           => json_encode($parameters['search'], JSON_UNESCAPED_UNICODE),
+            'search'           => $order['search']
         );
 
         $result = $this
