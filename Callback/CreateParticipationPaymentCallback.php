@@ -58,10 +58,7 @@ class CreateParticipationPaymentCallback extends AbstractPaymentCallback
                     $offer = $this
                         ->crawler
                         ->go('operation')
-                        ->execute(
-                            sprintf('/offers/%s', $options['offer']),
-                            'GET'
-                        )
+                        ->find(sprintf('/offers/%s', $options['offer']))
                         ->getData()
                     ;
 
