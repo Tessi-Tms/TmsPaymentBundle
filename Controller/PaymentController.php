@@ -29,8 +29,8 @@ class PaymentController extends Controller
             ->getBackend($backend_alias)
         ;
 
-        $order_id = $request->get('order_id');
-        if (null === $order_id) {
+        $orderId = $request->get('order_id');
+        if (null === $orderId) {
             throw new HttpException(400, 'order_id parameter is missing');
         }
 
@@ -44,7 +44,7 @@ class PaymentController extends Controller
             ->container
             ->get('tms_rest_client.hypermedia.crawler')
             ->go('order')
-            ->findOne('/orders', $order_id, array(), true)
+            ->findOne('/orders', $orderId, array(), true)
             ->getData()
         ;
 
@@ -53,6 +53,16 @@ class PaymentController extends Controller
         }
 
         $payment = new Payment($order['payment']);
+
+        $this->container->get('logger')->info(
+            sprintf('[%s] Payment auto response', $backend_alias),
+            array(
+                'order_id'  => $orderId,
+                'payment'   => $payment,
+                'callbacks' => $callbacks,
+            )
+        );
+
         $paymentBackend->doPayment($request, $payment);
         $response = new Response();
 
