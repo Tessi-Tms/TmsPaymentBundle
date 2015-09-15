@@ -44,7 +44,7 @@ class PaymentController extends Controller
             ->container
             ->get('tms_rest_client.hypermedia.crawler')
             ->go('order')
-            ->findOne('/orders', $order_id)
+            ->findOne('/orders', $order_id, array(), true)
             ->getData()
         ;
 
