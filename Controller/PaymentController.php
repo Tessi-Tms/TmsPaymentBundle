@@ -58,7 +58,7 @@ class PaymentController extends Controller
             sprintf('[%s] Payment auto response', $backend_alias),
             array(
                 'order_id'  => $orderId,
-                'payment'   => $payment,
+                'payment'   => $payment->toArray(),
                 'callbacks' => $callbacks,
             )
         );
