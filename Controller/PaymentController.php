@@ -60,6 +60,7 @@ class PaymentController extends Controller
                 'order_id'  => $orderId,
                 'payment'   => $payment->toArray(),
                 'callbacks' => $callbacks,
+                'post_data' => $request->request->all(),
             )
         );
 

@@ -87,8 +87,8 @@ abstract class SipsPaymentBackend extends AbstractPaymentBackend
         $shellOptions = array(
             'pathfile'               => $this->getPathFile(),
             'automatic_response_url' => $parameters['automatic_response_url'],
-            'normal_return_url'      => $parameters['return_url'],
-            'cancel_return_url'      => $parameters['return_url'],
+            'normal_return_url'      => $parameters['normal_return_url'],
+            'cancel_return_url'      => $parameters['cancel_return_url'],
             'merchant_id'            => $parameters['merchant_id'],
             'merchant_country'       => $parameters['merchant_country'],
             'amount'                 => $parameters['amount'],

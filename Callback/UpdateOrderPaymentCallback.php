@@ -35,13 +35,13 @@ class UpdateOrderPaymentCallback extends AbstractPaymentCallback
     {
         if ('Q' != $order['processingState']) {
             throw new \RuntimeException(sprintf('The order %s must be at the state "Q" and not "%s"',
-                $parameters['order_id'],
+                $order['id'],
                 $order['processingState']
             ));
         }
 
         if ($payment->getState() == Payment::STATE_NEW) {
-            //throw new \RuntimeException('The payment is still in the NEW state');
+            throw new \RuntimeException('The payment is still in the NEW state');
         }
 
         $patchOrder = array('payment' => $payment->toArray());
