@@ -25,6 +25,15 @@ class PaymentController extends Controller
      */
     public function autoResponseAction(Request $request, $backend_alias)
     {
+        $this->container->get('tms_payment.logger')->info(
+            sprintf('[%s] Payment auto response', $backend_alias),
+            array(
+                'order_id'  => $request->get('order_id'),
+                'callbacks' => $request->get('callbacks'),
+                'post_data' => $request->request->all(),
+            )
+        );
+
         $paymentBackend = $this->container->get('tms_payment.backend_registry')
             ->getBackend($backend_alias)
         ;
@@ -53,16 +62,6 @@ class PaymentController extends Controller
         }
 
         $payment = new Payment($order['payment']);
-
-        $this->container->get('logger')->info(
-            sprintf('[%s] Payment auto response', $backend_alias),
-            array(
-                'order_id'  => $orderId,
-                'payment'   => $payment->toArray(),
-                'callbacks' => $callbacks,
-                'post_data' => $request->request->all(),
-            )
-        );
 
         $paymentBackend->doPayment($request, $payment);
         $response = new Response();

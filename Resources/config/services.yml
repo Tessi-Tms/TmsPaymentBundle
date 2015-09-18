@@ -1,5 +1,19 @@
 services:
 
+    # Logger
+
+    tms_payment.logger:
+        class: Symfony\Bridge\Monolog\Logger
+        arguments: [tms_payment]
+        calls:
+            - [pushHandler, [@tms_payment.logger_handler]]
+
+    tms_payment.logger_handler:
+        class: Monolog\Handler\StreamHandler
+        # DEBUG:100, INFO:200, NOTICE:250, WARNING:300, ERROR:400, CRITICAL:500, ALERT:550, EMERGENCY:600
+        arguments: [%payments.logs_dir%/autoresponse_%kernel.environment%.log, 100]
+
+
     # Registry
 
     tms_payment.backend_registry:
