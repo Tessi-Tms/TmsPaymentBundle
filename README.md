@@ -49,6 +49,17 @@ imports:
     - { resource: @TmsPaymentBundle/Resources/config/config.yml }
 ```
 
+Add parameters:
+```yml
+# app/config/parameters.yml.dist
+
+payments.logs_dir: /tmp
+payments.sogenactif_pathfile: null
+payments.scellius_pathfile: null
+payments.paybox_keyspath: null
+payments.paybox_web_servers: [preprod-tpeweb.paybox.com]
+```
+
 To check if every thing seem to be ok, you can execute this command:
 ```sh
 $ php app/console container:debug
