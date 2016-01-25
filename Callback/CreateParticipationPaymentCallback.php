@@ -76,7 +76,9 @@ class CreateParticipationPaymentCallback extends AbstractPaymentCallback
                                 "unit"           => $benefit['unit']['name'],
                                 "unitScale"      => $benefit['unitScale'],
                                 "quantity"       => $benefit['quantity'],
-                                "raw"            => $benefit['options'] ? $benefit['options'] : array(),
+                                "raw"            => $benefit['options'] ?
+                                    (is_string($benefit['options']) ? json_decode($benefit['options'], true) : $benefit['options'])
+                                    : array(),
                             );
 
                             $rawBenefit['history'][] = array(
