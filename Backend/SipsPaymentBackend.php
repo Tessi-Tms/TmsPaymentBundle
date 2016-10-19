@@ -95,6 +95,8 @@ abstract class SipsPaymentBackend extends AbstractPaymentBackend
             'currency_code'          => CurrencyCode::getNumericCode($parameters['currency_code']),
             'order_id'               => $parameters['order_id'],
             'customer_email'         => $parameters['customer_email'],
+            'capture_day'            => $parameters['bank_delays'],
+            'capture_mode'           => 'AUTHOR_CAPTURE', //VALIDATION
         );
 
         $args = implode(' ', array_map(
@@ -108,6 +110,7 @@ abstract class SipsPaymentBackend extends AbstractPaymentBackend
             $args
         ));
         $process->run();
+        var_dump($args);die;
 
         list($_, $code, $error, $message) = explode("!", $process->getOutput());
         if ('0' !== $code) {
