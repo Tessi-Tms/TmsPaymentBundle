@@ -158,8 +158,9 @@ class PayboxPaymentBackend extends AbstractPaymentBackend
             'PBX_RETOUR'       => $this->getPayboxReturnString(),
             'PBX_HASH'         => $parameters['hash_method'],
             'PBX_TIME'         => $dateTime,
-            //'PBX_TYPECARTE'    => 'CARTE', // cf p52
-            //'PBX_TYPEPAIEMENT' => 'CB', //cf p52
+            'PBX_DIFF'         => sprintf('%02d', $parameters['bank_delays']),
+            //'PBX_TYPEPAIEMENT' => 'CARTE',
+            //'PBX_TYPECARTE'    => 'CB',
             //'PBX_ERRORCODETEST' => '999',
         );
 

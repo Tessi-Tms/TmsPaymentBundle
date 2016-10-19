@@ -110,7 +110,6 @@ abstract class SipsPaymentBackend extends AbstractPaymentBackend
             $args
         ));
         $process->run();
-        var_dump($args);die;
 
         list($_, $code, $error, $message) = explode("!", $process->getOutput());
         if ('0' !== $code) {
