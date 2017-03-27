@@ -1,7 +1,11 @@
 phpunit.xml
 
-# IDE specificities
-# Netbean
-nbproject/
 # Gedit
 *~
+
+# Tests
+/Tests/cache
+/Tests/logs
+
+# vendor
+/vendor

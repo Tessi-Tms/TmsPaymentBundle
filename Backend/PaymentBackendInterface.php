@@ -13,36 +13,11 @@ use Tms\Bundle\PaymentBundle\Model\Payment;
 interface PaymentBackendInterface
 {
     /**
-     * Set payment backend name
-     *
-     * @param string $name
-     *
-     * @return PaymentBackendInterface
-     */
-    public function setName($name);
-
-    /**
-     * Returns payment backend name
-     *
-     * @return string
-     */
-    public function getName();
-
-    /**
-     * Set payment backend configuration parameters
-     *
-     * @param array $parameters
-     *
-     * @return PaymentBackendInterface
-     */
-    public function setConfigurationParameters(array $parameters);
-
-    /**
-     * Returns payment backend configuration parameters
+     * Returns payment backend parameters
      *
      * @return array
      */
-    public function getConfigurationParameters();
+    public function getParameters();
 
     /**
      * Do the payment process
@@ -57,9 +32,9 @@ interface PaymentBackendInterface
     /**
      * Returns the HTML payment form.
      *
-     * @param array $parameters The payment parameters.
+     * @param array $options The payment options.
      *
      * @return string
      */
-    public function getPaymentForm(array $parameters);
+    public function getPaymentForm(array $options);
 }

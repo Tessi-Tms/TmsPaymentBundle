@@ -7,20 +7,13 @@
 
 namespace Tms\Bundle\PaymentBundle\Backend;
 
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Tms\Bundle\PaymentBundle\Model\Payment;
 use Tms\Bundle\PaymentBundle\Currency\CurrencyCode;
 
 class PayboxPaymentBackend extends AbstractPaymentBackend
 {
-    /**
-     * The kernel
-     *
-     * @var KernelInterface
-     */
-    protected $kernel;
-
     /**
      * @var Twig_Environment
      */
@@ -29,13 +22,26 @@ class PayboxPaymentBackend extends AbstractPaymentBackend
     /**
      * Constructor
      *
-     * @param KernelInterface $kernel The kernel.
+     * @param array $parameters
      * @param Twig_Environment $twig The twig environment.
      */
-    public function __construct(KernelInterface $kernel, \Twig_Environment $twig)
+    public function __construct(array $parameters, \Twig_Environment $twig)
     {
-        $this->kernel = $kernel;
+        parent::__construct($parameters);
+
         $this->twig = $twig;
+    }
+
+    /**
+     * Returns the paybox keypath
+     *
+     * @param string $site The paybox customer site id.
+     *
+     * @return string
+     */
+    protected function getKeyPath($site)
+    {
+        return sprintf('%s/%s.bin', $this->getParameter('keyspath'), $site);
     }
 
     /**
@@ -46,7 +52,7 @@ class PayboxPaymentBackend extends AbstractPaymentBackend
      */
     protected function getAvailableServer()
     {
-        $webServers = $this->getConfigurationParameter('web_servers');
+        $webServers = $this->getParameter('web_servers');
         if (count($webServers ) == 1) {
             return $webServers[0];
         }
@@ -69,24 +75,77 @@ class PayboxPaymentBackend extends AbstractPaymentBackend
     }
 
     /**
-     * Returns the paybox keypath
-     *
-     * @param string $site The paybox customer site id.
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    public function getKeyPath($site)
+    protected function configureParameters(OptionsResolverInterface $resolver)
     {
-        $path = $this->getConfigurationParameter('keyspath');
+        $resolver
+            ->setRequired(array('keyspath', 'web_servers'))
+        ;
+    }
 
-        if (null === $path) {
-            $path = sprintf('%s/../%s',
-                $this->kernel->getRootDir(),
-                'vendor/tms/payment-bundle/Tms/Bundle/PaymentBundle/Resources/bin/paybox/keys'
-            );
-        }
+    /**
+     * {@inheritdoc}
+     */
+    protected function configureOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver
+            ->setRequired(array(
+                'PBX_SITE',
+                'PBX_RANG',
+                'PBX_IDENTIFIANT',
+                'PBX_TOTAL',
+                'PBX_DEVISE',
+                'PBX_CMD',
+                'PBX_PORTEUR',
+                'PBX_REPONDRE_A',
+                'PBX_RUF1',
+                'PBX_EFFECTUE',
+                'PBX_REFUSE',
+                'PBX_ANNULE',
+                'PBX_ATTENTE',
+                'PBX_RETOUR',
+                'PBX_HASH',
+                'PBX_TIME',
+                'PBX_DIFF',
+            ))
+            ->setOptionals(array(
+                'PBX_TYPEPAIEMENT',
+                'PBX_TYPECARTE',
+                'PBX_ERRORCODETEST',
+            ))
+        ;
+    }
 
-        return sprintf('%s/%s.bin', realpath($path), $site);
+    /**
+     * {@inheritdoc}
+     */
+    public function doBuildPaymentOptions(array $options)
+    {
+        $msg = implode('&', array_map(
+            function ($k, $v) { return sprintf('%s=%s', $k, $v); },
+            array_keys($options),
+            $options
+        ));
+
+        $binKey = file_get_contents($this->getKeyPath($options['PBX_SITE']));
+        $options['PBX_HMAC'] = strtoupper(hash_hmac($options['PBX_HASH'], $msg, $binKey));
+
+        return $options;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildPaymentForm($builtOptions)
+    {
+        return $this->twig->render(
+            'TmsPaymentBundle:Payment:paybox.html.twig',
+            array(
+                'url' => sprintf('https://%s/cgi/MYchoix_pagepaiement.cgi', $this->getAvailableServer()),
+                'PBX' => $builtOptions,
+            )
+        );
     }
 
     /**
@@ -133,7 +192,6 @@ class PayboxPaymentBackend extends AbstractPaymentBackend
 
     /**
      * {@inheritdoc}
-     */
     public function getPaymentForm(array $parameters)
     {
         // ISO-8601
@@ -181,6 +239,7 @@ class PayboxPaymentBackend extends AbstractPaymentBackend
             )
         );
     }
+    */
 
     /**
      * {@inheritdoc}

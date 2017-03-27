@@ -27,9 +27,10 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->arrayNode('backends')
-                    ->useAttributeAsKey('')
+                    ->useAttributeAsKey('name')
                     ->prototype('array')
                         ->children()
+                            ->scalarNode('class')->isRequired()->end()
                             ->arrayNode('parameters')
                                 ->prototype('variable')->end()
                             ->end()

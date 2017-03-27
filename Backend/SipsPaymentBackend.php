@@ -7,8 +7,9 @@
 
 namespace Tms\Bundle\PaymentBundle\Backend;
 
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\Process\Process;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Tms\Bundle\PaymentBundle\Model\Payment;
 use Tms\Bundle\PaymentBundle\Currency\CurrencyCode;
@@ -16,76 +17,95 @@ use Tms\Bundle\PaymentBundle\Currency\CurrencyCode;
 abstract class SipsPaymentBackend extends AbstractPaymentBackend
 {
     /**
-     * The kernel
-     *
-     * @var KernelInterface
+     * {@inheritdoc}
      */
-    protected $kernel;
-
-    /**
-     * Constructor
-     *
-     * @param KernelInterface $kernel The kernel.
-     */
-    public function __construct(KernelInterface $kernel)
+    protected function configureParameters(OptionsResolverInterface $resolver)
     {
-        $this->kernel = $kernel;
-    }
-
-    /**
-     * Returns the default pathfile path
-     *
-     * @return string
-     */
-    abstract public function getDefaultPathfilePath();
-
-    /**
-     * Returns the sogenactif pathfile
-     *
-     * @return string
-     */
-    public function getPathFile()
-    {
-        $pathfile = $this->getConfigurationParameter('pathfile');
-
-        if (null === $pathfile) {
-            $pathfile = $this->kernel->locateResource($this->getDefaultPathfilePath());
-        }
-
-        return $pathfile;
-    }
-
-    /**
-     * Returns the request bin path
-     *
-     * @return string
-     */
-    protected function getRequestBinPath()
-    {
-        return $this->kernel->locateResource(
-             '@TmsPaymentBundle/Resources/bin/sips/static/request'
-        );
-    }
-
-    /**
-     * Returns the response bin path
-     *
-     * @return string
-     */
-    protected function getResponseBinPath()
-    {
-        return $this->kernel->locateResource(
-             '@TmsPaymentBundle/Resources/bin/sips/static/response'
-        );
+        $resolver
+            ->setRequired(array('pathfile', 'request_bin_path', 'response_bin_path'))
+        ;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPaymentForm(array $parameters)
+    protected function configureOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver
+            ->setRequired(array(
+                'automatic_response_url',
+                'normal_return_url',
+                'cancel_return_url',
+                'merchant_id',
+                'merchant_country',
+                'amount',
+                'currency_code',
+                'order_id',
+                'customer_email',
+            ))
+            ->setDefaults(array(
+                'pathfile'      => $this->getParameter('pathfile'),
+                'currency_code' => 'EUR',
+                'bank_delays'   => 0,
+                'capture_day'   => null,
+                'capture_mode'  => 'AUTHOR_CAPTURE',
+            ))
+            ->setNormalizers(array(
+                'currency_code' => function(Options $options, $value) {
+                    return CurrencyCode::getNumericCode($value);
+                },
+                'capture_day'   => function(Options $options, $value) {
+                    return $options['bank_delays'];
+                },
+            ))
+        ;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function postConfigureOptions(array & $options)
+    {
+        unset($options['bank_delays']);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function doBuildPaymentOptions(array $options)
+    {
+        return implode(' ', array_map(
+            function ($k, $v) { return sprintf('%s="%s"', $k, $v); },
+            array_keys($options),
+            $options
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildPaymentForm($builtOptions)
+    {
+        $process = new Process(sprintf('%s %s',
+            $this->getParameter('request_bin_path'),
+            $builtOptions
+        ));
+        $process->run();
+
+        list($_, $code, $error, $message) = explode("!", $process->getOutput());
+        if ('0' !== $code) {
+            return $error;
+        }
+
+        return $message;
+    }
+
+    /**
+     * {@inheritdoc}
+    public function getPaymentForm(array $options)
     {
         $shellOptions = array(
-            'pathfile'               => $this->getPathFile(),
+            'pathfile'               => $this->getParameter('pathfile'),
             'automatic_response_url' => $parameters['automatic_response_url'],
             'normal_return_url'      => $parameters['normal_return_url'],
             'cancel_return_url'      => $parameters['cancel_return_url'],
@@ -106,7 +126,7 @@ abstract class SipsPaymentBackend extends AbstractPaymentBackend
         ));
 
         $process = new Process(sprintf('%s %s',
-            $this->getRequestBinPath(),
+            $this->getParameter('request_bin_path'),
             $args
         ));
         $process->run();
@@ -118,6 +138,7 @@ abstract class SipsPaymentBackend extends AbstractPaymentBackend
 
         return $message;
     }
+     */
 
     /**
      * {@inheritdoc}

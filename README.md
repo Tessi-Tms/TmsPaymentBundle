@@ -41,14 +41,6 @@ public function registerBundles()
 }
 ```
 
-Import the bundle configuration:
-```yml
-# app/config/config.yml
-
-imports:
-    - { resource: @TmsPaymentBundle/Resources/config/config.yml }
-```
-
 Add parameters:
 ```yml
 # app/config/parameters.yml.dist

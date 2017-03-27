@@ -1,0 +1,6 @@
+DEBUG!NO!
+D_LOGO!/bundles/tmspayment/sips/logo/!
+F_CERTIFICATE!./Resources/bin/sips/param/certif!
+F_CTYPE!php!
+F_PARAM!./Resources/bin/sips/param/parmcom!
+F_DEFAULT!./Resources/bin/sips/param/parmcom.sogenactif!

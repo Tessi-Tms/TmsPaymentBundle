@@ -18,7 +18,6 @@ services:
 
     tms_payment.backend_registry:
         class: Tms\Bundle\PaymentBundle\Backend\PaymentBackendRegistry
-        arguments: [%tms_payment.backends%]
 
     tms_payment.callback_registry:
         class: Tms\Bundle\PaymentBundle\Callback\PaymentCallbackRegistry
@@ -28,21 +27,36 @@ services:
 
     tms_payment.backend.sogenactif:
         class: Tms\Bundle\PaymentBundle\Backend\SogenactifPaymentBackend
-        arguments: [@kernel]
+        arguments:
+            - {
+                pathfile: %payments.scellius_pathfile%,
+                requestBinPath: @TmsPaymentBundle/Resources/bin/sips/static/request,
+                responseBinPath: @TmsPaymentBundle/Resources/bin/sips/static/response
+            }
         tags:
-            -  { name: tms_payment.backend, alias: sogenactif }
+            - { name: tms_payment.backend, alias: sogenactif }
 
     tms_payment.backend.scellius:
         class: Tms\Bundle\PaymentBundle\Backend\ScelliusPaymentBackend
-        arguments: [@kernel]
+        arguments:
+            - {
+                pathfile: %payments.scellius_pathfile%,
+                requestBinPath: @TmsPaymentBundle/Resources/bin/sips/static/request,
+                responseBinPath: @TmsPaymentBundle/Resources/bin/sips/static/response
+            }
         tags:
-            -  { name: tms_payment.backend, alias: scellius }
+            - { name: tms_payment.backend, alias: scellius }
 
     tms_payment.backend.paybox:
         class: Tms\Bundle\PaymentBundle\Backend\PayboxPaymentBackend
-        arguments: [@kernel, @twig]
+        arguments:
+            - {
+                keyspath: %payments.paybox_keyspath%,
+                web_servers: %payments.paybox_web_servers%
+            }
+            - @twig
         tags:
-            -  { name: tms_payment.backend, alias: paybox }
+            - { name: tms_payment.backend, alias: paybox }
 
 
     # Callback
@@ -51,10 +65,10 @@ services:
         class: Tms\Bundle\PaymentBundle\Callback\UpdateOrderPaymentCallback
         arguments: [@tms_rest_client.hypermedia.crawler]
         tags:
-            -   { name: tms_payment.callback, alias: update_order }
+            - { name: tms_payment.callback, alias: update_order }
 
     tms_payment.callback.create_participation:
         class: Tms\Bundle\PaymentBundle\Callback\CreateParticipationPaymentCallback
         arguments: [@tms_rest_client.hypermedia.crawler]
         tags:
-            -   { name: tms_payment.callback, alias: create_participation }
+            - { name: tms_payment.callback, alias: create_participation }

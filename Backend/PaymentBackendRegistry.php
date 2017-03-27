@@ -15,30 +15,10 @@ class PaymentBackendRegistry implements PaymentBackendRegistryInterface
     private $backends = array();
 
     /**
-     * @var array
-     */
-    private $configuration;
-
-    /**
-     * Constructor
-     *
-     * @param array $configuration The payment backends configuration.
-     */
-    public function __construct(array $configuration)
-    {
-        $this->configuration = $configuration;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function setBackend($alias, PaymentBackendInterface $backend)
     {
-        $backend->setName($alias);
-        if (isset($this->configuration[$alias])) {
-            $backend->setConfigurationParameters($this->configuration[$alias]['parameters']);
-        }
-
         $this->backends[$alias] = $backend;
 
         return $this;

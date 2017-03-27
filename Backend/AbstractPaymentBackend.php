@@ -7,82 +7,62 @@
 
 namespace Tms\Bundle\PaymentBundle\Backend;
 
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Tms\Bundle\PaymentBundle\Model\Payment;
 
 abstract class AbstractPaymentBackend implements PaymentBackendInterface
 {
-    /**
-     * @var string
-     */
-    protected $name;
-
     /**
      * @var array
      */
     protected $parameters;
 
     /**
-     * {@inheritdoc}
+     * Construtor
+     *
+     * @param array  $parameters
      */
-    public function setName($name)
+    public function __construct($parameters)
     {
-        $this->name = $name;
-
-        return $this;
+        $resolver = new OptionsResolver();
+        $this->configureParameters($resolver);
+        $this->parameters = $resolver->resolve($parameters);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setConfigurationParameters(array $parameters)
-    {
-        $this->parameters = $parameters;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getConfigurationParameters()
+    public function getParameters()
     {
         return $this->parameters;
     }
 
     /**
-     * Returns whether the given configuration parameter key is defined.
+     * Returns whether the given parameter key is defined.
      *
-     * @param string $key The configuration parameter key.
+     * @param string $key The parameter key.
      *
-     * @return bool Whether the configuration parameter key is defined.
+     * @return bool Whether the parameter key is defined.
      */
-    public function hasConfigurationParameter($key)
+    public function hasParameter($key)
     {
-        return array_key_exists($key, $this->parameters);
+        return null !== $this->parameters && array_key_exists($key, $this->parameters);
     }
 
     /**
-     * Returns needed configuration parameter
+     * Returns needed parameter
      *
-     * @param string $key The configuration parameter key
+     * @param string $key The parameter key
      *
-     * @return mixed The configuration parameter's value.
+     * @return mixed The parameter's value.
      * @throw InvalidArgumentException
      */
-    public function getConfigurationParameter($key)
+    public function getParameter($key)
     {
-        if (!$this->hasConfigurationParameter($key)) {
+        if (!$this->hasParameter($key)) {
             throw new \InvalidArgumentException(sprintf(
-                'The %s payment backend configuration parameter "%s" doesn\'t exist',
+                'The %s payment backend parameter "%s" doesn\'t exist',
                 $this->getName(),
                 $key
             ));
@@ -90,4 +70,82 @@ abstract class AbstractPaymentBackend implements PaymentBackendInterface
 
         return $this->parameters[$key];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPaymentForm(array $options)
+    {
+        return $this->buildPaymentForm($this->buildPaymentOptions($options));
+    }
+
+    /**
+     * Build payment options.
+     *
+     * @param array $options
+     *
+     * @return mixed
+     */
+    protected function buildPaymentOptions(array $options)
+    {
+        $this->preConfigureOptions($options);
+
+        $resolver = new OptionsResolver();
+        $this->configureOptions($resolver);
+        $resolvedOptions = $resolver->resolve($options);
+
+        $this->postConfigureOptions($resolvedOptions);
+
+        return $this->doBuildPaymentOptions($resolvedOptions);
+    }
+
+    /**
+     * Pre configure options.
+     *
+     * @param array $options
+     */
+    protected function preConfigureOptions(array & $options)
+    {
+    }
+
+    /**
+     * Post configure options.
+     *
+     * @param array $options
+     */
+    protected function postConfigureOptions(array & $options)
+    {
+    }
+
+    /**
+     * Do build payment options.
+     *
+     * @param array $options
+     *
+     * @return mixed
+     */
+    abstract protected function doBuildPaymentOptions(array $options);
+
+    /**
+     * Configure parameters.
+     *
+     * @param OptionsResolverInterface $resolver
+     */
+    abstract protected function configureParameters(OptionsResolverInterface $resolver);
+
+    /**
+     * Configure options.
+     *
+     * @param OptionsResolverInterface $resolver
+     */
+    abstract protected function configureOptions(OptionsResolverInterface $resolver);
+
+    /**
+     * Build payment form.
+     *
+     * @param mixed $builtOptions
+     *
+     * @return string
+     */
+    abstract public function buildPaymentForm($builtOptions);
 }
