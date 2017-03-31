@@ -1,6 +1,5 @@
 DEBUG!NO!
-D_LOGO!/bundles/tmspayment/sips/logo/!
-F_CERTIFICATE!../vendor/tms/payment-bundle/Tms/Bundle/PaymentBundle/Resources/bin/sips/param/certif!
+F_CERTIFICATE!./Tests/bin/sips/param/certif!
 F_CTYPE!php!
-F_PARAM!../vendor/tms/payment-bundle/Tms/Bundle/PaymentBundle/Resources/bin/sips/param/parmcom!
-F_DEFAULT!../vendor/tms/payment-bundle/Tms/Bundle/PaymentBundle/Resources/bin/sips/param/parmcom.sogenactif!
+F_PARAM!./Tests/bin/sips/param/parmcom!
+F_DEFAULT!./Tests/bin/sips/param/parmcom.sogenactif!

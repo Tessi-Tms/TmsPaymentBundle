@@ -29,7 +29,6 @@ class TmsPaymentExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
 
-        var_dump($config['backends']); die;
         $container->setParameter('tms_payment.backends', $config['backends']);
     }
 }

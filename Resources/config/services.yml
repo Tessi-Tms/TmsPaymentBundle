@@ -26,34 +26,29 @@ services:
     # Backend
 
     tms_payment.backend.sogenactif:
-        class: Tms\Bundle\PaymentBundle\Backend\SogenactifPaymentBackend
+        class: Tms\Bundle\PaymentBundle\Backend\SipsPaymentBackend
         arguments:
-            - {
-                pathfile: %payments.scellius_pathfile%,
-                requestBinPath: @TmsPaymentBundle/Resources/bin/sips/static/request,
-                responseBinPath: @TmsPaymentBundle/Resources/bin/sips/static/response
-            }
+            -
+                pathfile: %payments.sogenactif_pathfile%
+                request_bin_path: "@=service('kernel').locateResource('@TmsPaymentBundle/Resources/bin/sips/static/request')"
+                response_bin_path: "@=service('kernel').locateResource('@TmsPaymentBundle/Resources/bin/sips/static/response')"
         tags:
             - { name: tms_payment.backend, alias: sogenactif }
 
     tms_payment.backend.scellius:
-        class: Tms\Bundle\PaymentBundle\Backend\ScelliusPaymentBackend
+        class: Tms\Bundle\PaymentBundle\Backend\SipsPaymentBackend
         arguments:
-            - {
-                pathfile: %payments.scellius_pathfile%,
-                requestBinPath: @TmsPaymentBundle/Resources/bin/sips/static/request,
-                responseBinPath: @TmsPaymentBundle/Resources/bin/sips/static/response
-            }
+            -
+                pathfile: %payments.scellius_pathfile%
+                request_bin_path: "@=service('kernel').locateResource('@TmsPaymentBundle/Resources/bin/sips/static/request')"
+                response_bin_path: "@=service('kernel').locateResource('@TmsPaymentBundle/Resources/bin/sips/static/response')"
         tags:
             - { name: tms_payment.backend, alias: scellius }
 
     tms_payment.backend.paybox:
         class: Tms\Bundle\PaymentBundle\Backend\PayboxPaymentBackend
         arguments:
-            - {
-                keyspath: %payments.paybox_keyspath%,
-                web_servers: %payments.paybox_web_servers%
-            }
+            - { keyspath: %payments.paybox_keyspath%, web_servers: %payments.paybox_web_servers% }
             - @twig
         tags:
             - { name: tms_payment.backend, alias: paybox }

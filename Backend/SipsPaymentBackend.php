@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Tms\Bundle\PaymentBundle\Model\Payment;
 use Tms\Bundle\PaymentBundle\Currency\CurrencyCode;
 
-abstract class SipsPaymentBackend extends AbstractPaymentBackend
+class SipsPaymentBackend extends AbstractPaymentBackend
 {
     /**
      * {@inheritdoc}
@@ -33,30 +33,41 @@ abstract class SipsPaymentBackend extends AbstractPaymentBackend
     {
         $resolver
             ->setRequired(array(
+                'merchant_id',
+                'merchant_country',
+                'order_id',
+                'customer_email',
+                'amount',
                 'automatic_response_url',
                 'normal_return_url',
                 'cancel_return_url',
-                'merchant_id',
-                'merchant_country',
-                'amount',
-                'currency_code',
-                'order_id',
-                'customer_email',
             ))
             ->setDefaults(array(
                 'pathfile'      => $this->getParameter('pathfile'),
                 'currency_code' => 'EUR',
-                'bank_delays'   => 0,
-                'capture_day'   => null,
+                'capture_day'   => 0,
                 'capture_mode'  => 'AUTHOR_CAPTURE',
             ))
             ->setNormalizers(array(
                 'currency_code' => function(Options $options, $value) {
                     return CurrencyCode::getNumericCode($value);
                 },
-                'capture_day'   => function(Options $options, $value) {
-                    return $options['bank_delays'];
-                },
+            ))
+            ->setAllowedTypes(array(
+                'automatic_response_url' => array('string'),
+                'normal_return_url'      => array('string'),
+                'cancel_return_url'      => array('string'),
+                'merchant_id'            => array('string'),
+                'merchant_country'       => array('string'),
+                'amount'                 => array('integer'),
+                'order_id'               => array('string'),
+                'customer_email'         => array('string'),
+                'pathfile'               => array('string'),
+                'capture_day'            => array('integer'),
+            ))
+            ->setAllowedValues(array(
+                'currency_code' => CurrencyCode::getAlphabeticCodes(),
+                'capture_mode'  => array('AUTHOR_CAPTURE', 'VALIDATION'),
             ))
         ;
     }
@@ -64,8 +75,9 @@ abstract class SipsPaymentBackend extends AbstractPaymentBackend
     /**
      * {@inheritdoc}
      */
-    public function postConfigureOptions(array & $options)
+    public function preConfigureOptions(array & $options)
     {
+        $options['capture_day'] = $options['bank_delays'];
         unset($options['bank_delays']);
     }
 
@@ -74,6 +86,8 @@ abstract class SipsPaymentBackend extends AbstractPaymentBackend
      */
     public function doBuildPaymentOptions(array $options)
     {
+        ksort($options);
+
         return implode(' ', array_map(
             function ($k, $v) { return sprintf('%s="%s"', $k, $v); },
             array_keys($options),
@@ -99,46 +113,6 @@ abstract class SipsPaymentBackend extends AbstractPaymentBackend
 
         return $message;
     }
-
-    /**
-     * {@inheritdoc}
-    public function getPaymentForm(array $options)
-    {
-        $shellOptions = array(
-            'pathfile'               => $this->getParameter('pathfile'),
-            'automatic_response_url' => $parameters['automatic_response_url'],
-            'normal_return_url'      => $parameters['normal_return_url'],
-            'cancel_return_url'      => $parameters['cancel_return_url'],
-            'merchant_id'            => $parameters['merchant_id'],
-            'merchant_country'       => $parameters['merchant_country'],
-            'amount'                 => $parameters['amount'],
-            'currency_code'          => CurrencyCode::getNumericCode($parameters['currency_code']),
-            'order_id'               => $parameters['order_id'],
-            'customer_email'         => $parameters['customer_email'],
-            'capture_day'            => $parameters['bank_delays'],
-            'capture_mode'           => 'AUTHOR_CAPTURE', //VALIDATION
-        );
-
-        $args = implode(' ', array_map(
-            function ($k, $v) { return sprintf('%s="%s"', $k, $v); },
-            array_keys($shellOptions),
-            $shellOptions
-        ));
-
-        $process = new Process(sprintf('%s %s',
-            $this->getParameter('request_bin_path'),
-            $args
-        ));
-        $process->run();
-
-        list($_, $code, $error, $message) = explode("!", $process->getOutput());
-        if ('0' !== $code) {
-            return $error;
-        }
-
-        return $message;
-    }
-     */
 
     /**
      * {@inheritdoc}

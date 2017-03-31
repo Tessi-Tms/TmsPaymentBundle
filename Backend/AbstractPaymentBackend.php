@@ -86,7 +86,7 @@ abstract class AbstractPaymentBackend implements PaymentBackendInterface
      *
      * @return mixed
      */
-    protected function buildPaymentOptions(array $options)
+    public function buildPaymentOptions(array $options)
     {
         $this->preConfigureOptions($options);
 
@@ -118,6 +118,13 @@ abstract class AbstractPaymentBackend implements PaymentBackendInterface
     }
 
     /**
+     * Configure options.
+     *
+     * @param OptionsResolverInterface $resolver
+     */
+    abstract protected function configureOptions(OptionsResolverInterface $resolver);
+
+    /**
      * Do build payment options.
      *
      * @param array $options
@@ -134,18 +141,11 @@ abstract class AbstractPaymentBackend implements PaymentBackendInterface
     abstract protected function configureParameters(OptionsResolverInterface $resolver);
 
     /**
-     * Configure options.
-     *
-     * @param OptionsResolverInterface $resolver
-     */
-    abstract protected function configureOptions(OptionsResolverInterface $resolver);
-
-    /**
      * Build payment form.
      *
      * @param mixed $builtOptions
      *
      * @return string
      */
-    abstract public function buildPaymentForm($builtOptions);
+    abstract protected function buildPaymentForm($builtOptions);
 }
