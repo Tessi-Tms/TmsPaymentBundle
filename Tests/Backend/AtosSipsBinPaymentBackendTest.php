@@ -2,10 +2,10 @@
 
 namespace Tms\Bundle\PaymentBundle\Tests\Backend;
 
-use Tms\Bundle\PaymentBundle\Backend\SipsPaymentBackend;
+use Tms\Bundle\PaymentBundle\Backend\AtosSipsBinPaymentBackend;
 use Tms\Bundle\PaymentBundle\Currency\CurrencyCode;
 
-class SipsPaymentBackendTest extends \PHPUnit_Framework_TestCase
+class AtosSipsBinPaymentBackendTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @PaymentBackendInterface
@@ -18,12 +18,12 @@ class SipsPaymentBackendTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $parameters = array(
-            'pathfile'          => __DIR__.'/../Resources/bin/sips/param/pathfile.test',
-            'request_bin_path'  => __DIR__.'/../Resources/bin/sips/static/request',
-            'response_bin_path' => __DIR__.'/../Resources/bin/sips/static/response'
+            'pathfile'          => __DIR__.'/../Resources/sips/atos/bin/param/pathfile.test',
+            'request_bin_path'  => __DIR__.'/../Resources/sips/atos/bin/static/request',
+            'response_bin_path' => __DIR__.'/../Resources/sips/atos/bin/static/response'
         );
 
-        $this->paymentBackend = new SipsPaymentBackend($parameters);
+        $this->paymentBackend = new AtosSipsBinPaymentBackend($parameters);
     }
 
     /**
@@ -61,7 +61,7 @@ class SipsPaymentBackendTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertEquals(
-            'amount="100" automatic_response_url="http://automatic_response_url" cancel_return_url="http://cancel_return_url" capture_day="0" capture_mode="AUTHOR_CAPTURE" currency_code="978" customer_email="customer@email.com" merchant_country="fr" merchant_id="014213245611111" normal_return_url="http://normal_return_url" order_id="order_id" pathfile="/var/www/html/Tests/Backend/../Resources/bin/sips/param/pathfile.test"',
+            'amount="100" automatic_response_url="http://automatic_response_url" cancel_return_url="http://cancel_return_url" capture_day="0" capture_mode="AUTHOR_CAPTURE" currency_code="978" customer_email="customer@email.com" merchant_country="fr" merchant_id="014213245611111" normal_return_url="http://normal_return_url" order_id="order_id" pathfile="/var/www/html/Tests/Backend/../Resources/sips/atos/bin/param/pathfile.test"',
             $builtOptions
         );
     }

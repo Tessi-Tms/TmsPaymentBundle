@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Tms\Bundle\PaymentBundle\Model\Payment;
 use Tms\Bundle\PaymentBundle\Currency\CurrencyCode;
 
-class SipsPaymentBackend extends AbstractPaymentBackend
+class AtosSipsBinPaymentBackend extends AbstractPaymentBackend
 {
     /**
      * {@inheritdoc}
@@ -43,7 +43,6 @@ class SipsPaymentBackend extends AbstractPaymentBackend
                 'cancel_return_url',
             ))
             ->setDefaults(array(
-                'pathfile'      => $this->getParameter('pathfile'),
                 'currency_code' => 'EUR',
                 'capture_day'   => 0,
                 'capture_mode'  => 'AUTHOR_CAPTURE',
@@ -62,7 +61,6 @@ class SipsPaymentBackend extends AbstractPaymentBackend
                 'amount'                 => array('integer'),
                 'order_id'               => array('string'),
                 'customer_email'         => array('string'),
-                'pathfile'               => array('string'),
                 'capture_day'            => array('integer'),
             ))
             ->setAllowedValues(array(
@@ -90,7 +88,6 @@ class SipsPaymentBackend extends AbstractPaymentBackend
             'automatic_response_url',
             'normal_return_url',
             'cancel_return_url',
-            'pathfile',
             'currency_code',
             'capture_day',
             'capture_mode'
@@ -101,6 +98,14 @@ class SipsPaymentBackend extends AbstractPaymentBackend
                 unset($options[$key]);
             }
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function postConfigureOptions(array & $options)
+    {
+        $options['pathfile'] = $this->getParameter('pathfile');
     }
 
     /**

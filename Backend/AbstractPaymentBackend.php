@@ -62,8 +62,7 @@ abstract class AbstractPaymentBackend implements PaymentBackendInterface
     {
         if (!$this->hasParameter($key)) {
             throw new \InvalidArgumentException(sprintf(
-                'The %s payment backend parameter "%s" doesn\'t exist',
-                $this->getName(),
+                'The payment backend parameter "%s" doesn\'t exist',
                 $key
             ));
         }

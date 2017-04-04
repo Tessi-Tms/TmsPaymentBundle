@@ -17,16 +17,13 @@ class PayboxPaymentBackendTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $parameters = array(
-            'keyspath'    => __DIR__.'/../Resources/bin/paybox/keys',
+            'keys_path'   => __DIR__.'/../Resources/sips/paybox/keys',
             'web_servers' => array('preprod-tpeweb.paybox.com'),
         );
 
         $loader = new \Twig_Loader_Filesystem(__DIR__.'/../../Resources/views');
 
-        $this->paymentBackend = new PayboxPaymentBackend(
-            $parameters,
-            new \Twig_Environment($loader)
-        );
+        $this->paymentBackend = new PayboxPaymentBackend($parameters, new \Twig_Environment($loader));
     }
 
     /**
@@ -85,25 +82,4 @@ class PayboxPaymentBackendTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://normal_return_url', $builtOptions['PBX']['PBX_ATTENTE']);
         $this->assertEquals('00', $builtOptions['PBX']['PBX_DIFF']);
     }
-
-    /**
-     * Test doPayement
-    public function testGetPaymentForm()
-    {
-        $htmlForm = $this->paymentBackend->getPaymentForm(array(
-            'merchant_id'            => '1999888|32|110647233',
-            'merchant_country'       => 'fr',
-            'order_id'               => 'order_id',
-            'customer_email'         => 'customer@email.com',
-            'amount'                 => 100,
-            'currency_code'          => 'EUR',
-            'bank_delays'            => 0,
-            'automatic_response_url' => 'http://automatic_response_url',
-            'cancel_return_url'      => 'http://cancel_return_url',
-            'normal_return_url'      => 'http://normal_return_url',
-        ));
-
-        var_dump($htmlForm);die;
-    }
-     */
 }

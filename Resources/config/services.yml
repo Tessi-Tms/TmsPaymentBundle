@@ -26,29 +26,37 @@ services:
     # Backend
 
     tms_payment.backend.sogenactif:
-        class: Tms\Bundle\PaymentBundle\Backend\SipsPaymentBackend
+        class: Tms\Bundle\PaymentBundle\Backend\AtosSipsBinPaymentBackend
         arguments:
             -
                 pathfile: %payments.sogenactif_pathfile%
-                request_bin_path: "@=service('kernel').locateResource('@TmsPaymentBundle/Resources/bin/sips/static/request')"
-                response_bin_path: "@=service('kernel').locateResource('@TmsPaymentBundle/Resources/bin/sips/static/response')"
+                request_bin_path: "@=service('kernel').locateResource('@TmsPaymentBundle/Resources/sips/atos/bin/static/request')"
+                response_bin_path: "@=service('kernel').locateResource('@TmsPaymentBundle/Resources/sips/atos/bin/static/response')"
         tags:
             - { name: tms_payment.backend, alias: sogenactif }
 
     tms_payment.backend.scellius:
-        class: Tms\Bundle\PaymentBundle\Backend\SipsPaymentBackend
+        class: Tms\Bundle\PaymentBundle\Backend\AtosSipsBinPaymentBackend
         arguments:
             -
                 pathfile: %payments.scellius_pathfile%
-                request_bin_path: "@=service('kernel').locateResource('@TmsPaymentBundle/Resources/bin/sips/static/request')"
-                response_bin_path: "@=service('kernel').locateResource('@TmsPaymentBundle/Resources/bin/sips/static/response')"
+                request_bin_path: "@=service('kernel').locateResource('@TmsPaymentBundle/Resources/sips/atos/bin/static/request')"
+                response_bin_path: "@=service('kernel').locateResource('@TmsPaymentBundle/Resources/sips/atos/bin/static/response')"
         tags:
             - { name: tms_payment.backend, alias: scellius }
+
+    tms_payment.backend.mercanet:
+        class: Tms\Bundle\PaymentBundle\Backend\AtosSipsSealPaymentBackend
+        arguments:
+            - { keys_path: %payments.mercanet_keys_path%, web_server: %payments.mercanet_web_server% }
+            - @twig
+        tags:
+            - { name: tms_payment.backend, alias: mercanet }
 
     tms_payment.backend.paybox:
         class: Tms\Bundle\PaymentBundle\Backend\PayboxPaymentBackend
         arguments:
-            - { keyspath: %payments.paybox_keyspath%, web_servers: %payments.paybox_web_servers% }
+            - { keys_path: %payments.paybox_keys_path%, web_servers: %payments.paybox_web_servers% }
             - @twig
         tags:
             - { name: tms_payment.backend, alias: paybox }

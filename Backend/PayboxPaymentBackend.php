@@ -42,7 +42,7 @@ class PayboxPaymentBackend extends AbstractPaymentBackend
      */
     protected function getKeyPath($site)
     {
-        return sprintf('%s/%s.bin', $this->getParameter('keyspath'), $site);
+        return sprintf('%s/%s.bin', $this->getParameter('keys_path'), $site);
     }
 
     /**
@@ -81,7 +81,7 @@ class PayboxPaymentBackend extends AbstractPaymentBackend
     protected function configureParameters(OptionsResolverInterface $resolver)
     {
         $resolver
-            ->setRequired(array('keyspath', 'web_servers'))
+            ->setRequired(array('keys_path', 'web_servers'))
         ;
     }
 

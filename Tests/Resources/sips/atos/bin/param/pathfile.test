@@ -1,0 +1,6 @@
+DEBUG!NO!
+D_LOGO!/bundles/tmspayment/sips/logo/!
+F_CERTIFICATE!./Tests/Resources/sips/atos/bin/param/certif!
+F_CTYPE!php!
+F_PARAM!./Tests/Resources/sips/atos/bin/param/parmcom!
+F_DEFAULT!./Tests/Resources/sips/atos/bin/param/parmcom.test!
