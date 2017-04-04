@@ -75,16 +75,38 @@ class SipsPaymentBackend extends AbstractPaymentBackend
     /**
      * {@inheritdoc}
      */
-    public function preConfigureOptions(array & $options)
+    protected function preConfigureOptions(array & $options)
     {
-        $options['capture_day'] = $options['bank_delays'];
-        unset($options['bank_delays']);
+        if (isset($options['bank_delays'])) {
+            $options['capture_day'] = $options['bank_delays'];
+        }
+
+        $availableOptionKeys = array(
+            'merchant_id',
+            'merchant_country',
+            'order_id',
+            'customer_email',
+            'amount',
+            'automatic_response_url',
+            'normal_return_url',
+            'cancel_return_url',
+            'pathfile',
+            'currency_code',
+            'capture_day',
+            'capture_mode'
+        );
+
+        foreach ($options as $key => $value) {
+            if (!in_array($key, $availableOptionKeys)) {
+                unset($options[$key]);
+            }
+        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function doBuildPaymentOptions(array $options)
+    protected function doBuildPaymentOptions(array $options)
     {
         ksort($options);
 
@@ -98,7 +120,7 @@ class SipsPaymentBackend extends AbstractPaymentBackend
     /**
      * {@inheritdoc}
      */
-    public function buildPaymentForm($builtOptions)
+    protected function buildPaymentForm($builtOptions)
     {
         $process = new Process(sprintf('%s %s',
             $this->getParameter('request_bin_path'),
@@ -124,7 +146,7 @@ class SipsPaymentBackend extends AbstractPaymentBackend
         }
 
         $shellOptions = array(
-            'pathfile' => $this->getPathFile(),
+            'pathfile' => $this->getParameter('pathfile'),
             'message'  => $request->request->get('DATA'),
         );
 
@@ -135,7 +157,7 @@ class SipsPaymentBackend extends AbstractPaymentBackend
         ));
 
         $process = new Process(sprintf('%s %s',
-            $this->getResponseBinPath(),
+            $this->getParameter('response_bin_path'),
             $args
         ));
         $process->run();
@@ -200,7 +222,7 @@ class SipsPaymentBackend extends AbstractPaymentBackend
             ->setRaw($raw)
         ;
 
-        // Look at sogenactif documentation for the '17' response code return value.
+        // Look at documentation for the '17' response code return value.
         if ($raw['response_code'] == '17') {
             $payment->setState(Payment::STATE_CANCELED);
         } elseif ('0' === $raw['code'] && '00' === $raw['response_code']) {

@@ -7,6 +7,7 @@
 
 namespace Tms\Bundle\PaymentBundle\Backend;
 
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Tms\Bundle\PaymentBundle\Model\Payment;
@@ -85,75 +86,11 @@ class PayboxPaymentBackend extends AbstractPaymentBackend
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function configureOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver
-            ->setRequired(array(
-                'PBX_SITE',
-                'PBX_RANG',
-                'PBX_IDENTIFIANT',
-                'PBX_TOTAL',
-                'PBX_DEVISE',
-                'PBX_CMD',
-                'PBX_PORTEUR',
-                'PBX_REPONDRE_A',
-                'PBX_RUF1',
-                'PBX_EFFECTUE',
-                'PBX_REFUSE',
-                'PBX_ANNULE',
-                'PBX_ATTENTE',
-                'PBX_RETOUR',
-                'PBX_HASH',
-                'PBX_TIME',
-                'PBX_DIFF',
-            ))
-            ->setOptionals(array(
-                'PBX_TYPEPAIEMENT',
-                'PBX_TYPECARTE',
-                'PBX_ERRORCODETEST',
-            ))
-        ;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function doBuildPaymentOptions(array $options)
-    {
-        $msg = implode('&', array_map(
-            function ($k, $v) { return sprintf('%s=%s', $k, $v); },
-            array_keys($options),
-            $options
-        ));
-
-        $binKey = file_get_contents($this->getKeyPath($options['PBX_SITE']));
-        $options['PBX_HMAC'] = strtoupper(hash_hmac($options['PBX_HASH'], $msg, $binKey));
-
-        return $options;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function buildPaymentForm($builtOptions)
-    {
-        return $this->twig->render(
-            'TmsPaymentBundle:Payment:paybox.html.twig',
-            array(
-                'url' => sprintf('https://%s/cgi/MYchoix_pagepaiement.cgi', $this->getAvailableServer()),
-                'PBX' => $builtOptions,
-            )
-        );
-    }
-
-    /**
      * Returns paybox PBX_RETOUR string.
      *
      * @return string
      */
-    public function getPayboxReturnString()
+    protected function getPayboxReturnString()
     {
         //return 'total:M;orderid:R;auth:A;trans:T;error:E;sign:K';
         // Look at paybox documentation for PBX_RETOUR (p.43)
@@ -192,54 +129,163 @@ class PayboxPaymentBackend extends AbstractPaymentBackend
 
     /**
      * {@inheritdoc}
-    public function getPaymentForm(array $parameters)
+     */
+    protected function configureOptions(OptionsResolverInterface $resolver)
     {
-        // ISO-8601
-        $dateTime = date("c");
+        $resolver
+            ->setRequired(array(
+                'PBX_SITE',
+                'PBX_RANG',
+                'PBX_IDENTIFIANT',
+                'PBX_TOTAL',
+                'PBX_DEVISE',
+                'PBX_CMD',
+                'PBX_PORTEUR',
+                'PBX_REPONDRE_A',
+                'PBX_EFFECTUE',
+                'PBX_REFUSE',
+                'PBX_ANNULE',
+                'PBX_ATTENTE',
+                'PBX_DIFF',
+            ))
+            ->setDefaults(array(
+                'PBX_HASH'         => 'sha512',
+                'PBX_RUF1'         => 'POST',
+                'PBX_RETOUR'       => $this->getPayboxReturnString(),
+                'PBX_TIME'         => date("c"), // ISO-8601
+                'PBX_TYPEPAIEMENT' => 'CARTE',
+                'PBX_TYPECARTE'    => 'CB',
+                //'PBX_ERRORCODETEST' => '999',
+            ))
+            ->setOptional(array(
+            ))
+            ->setNormalizers(array(
+                'PBX_DEVISE' => function(Options $options, $value) {
+                    return CurrencyCode::getNumericCode($value);
+                },
+                'PBX_DIFF' => function(Options $options, $value) {
+                    return sprintf('%02d', $value);
+                }
+            ))
+            ->setAllowedValues(array(
+                'PBX_HASH' => array(
+                    'sha512',
+                    'sha384',
+                    'sha256',
+                    'sha224',
+                    'ripemd160',
+                    'mdc2',
+                ),
+                'PBX_DEVISE' => CurrencyCode::getAlphabeticCodes(),
+            ))
+            ->setAllowedTypes(array(
+                'PBX_SITE'        => array('string'),
+                'PBX_RANG'        => array('string'),
+                'PBX_IDENTIFIANT' => array('string'),
+                'PBX_TOTAL'       => array('integer'),
+                'PBX_DEVISE'      => array('string'),
+                'PBX_CMD'         => array('string'),
+                'PBX_PORTEUR'     => array('string'),
+                'PBX_REPONDRE_A'  => array('string'),
+                'PBX_EFFECTUE'    => array('string'),
+                'PBX_REFUSE'      => array('string'),
+                'PBX_ANNULE'      => array('string'),
+                'PBX_ATTENTE'     => array('string'),
+                'PBX_DIFF'        => array('integer'),
+            ))
+        ;
+    }
 
-        list($pbxSite, $pbxRang, $pbxIdentifiant) = explode('|', $parameters['merchant_id']);
+    /**
+     * {@inheritdoc}
+     */
+    protected function preConfigureOptions(array & $options)
+    {
+        list($pbxSite, $pbxRang, $pbxIdentifiant) = explode('|', $options['merchant_id']);
 
-        $pbxOptions = array(
-            'PBX_SITE'         => $pbxSite,
-            'PBX_RANG'         => $pbxRang,
-            'PBX_IDENTIFIANT'  => $pbxIdentifiant,
-            'PBX_TOTAL'        => $parameters['amount'],
-            'PBX_DEVISE'       => CurrencyCode::getNumericCode($parameters['currency_code']),
-            'PBX_CMD'          => $parameters['order_id'],
-            'PBX_PORTEUR'      => $parameters['customer_email'],
-            'PBX_REPONDRE_A'   => $parameters['automatic_response_url'],
-            'PBX_RUF1'         => 'POST',
-            'PBX_EFFECTUE'     => $parameters['normal_return_url'],
-            'PBX_REFUSE'       => $parameters['cancel_return_url'],
-            'PBX_ANNULE'       => $parameters['cancel_return_url'],
-            'PBX_ATTENTE'      => $parameters['normal_return_url'],
-            'PBX_RETOUR'       => $this->getPayboxReturnString(),
-            'PBX_HASH'         => $parameters['hash_method'],
-            'PBX_TIME'         => $dateTime,
-            'PBX_DIFF'         => sprintf('%02d', $parameters['bank_delays']),
-            //'PBX_TYPEPAIEMENT' => 'CARTE',
-            //'PBX_TYPECARTE'    => 'CB',
-            //'PBX_ERRORCODETEST' => '999',
+        $options['PBX_SITE']        = $pbxSite;
+        $options['PBX_RANG']        = $pbxRang;
+        $options['PBX_IDENTIFIANT'] = $pbxIdentifiant;
+        $options['PBX_TOTAL']       = $options['amount'];
+        $options['PBX_DEVISE']      = $options['currency_code'];
+        $options['PBX_CMD']         = $options['order_id'];
+        $options['PBX_PORTEUR']     = $options['customer_email'];
+        $options['PBX_REPONDRE_A']  = $options['automatic_response_url'];
+        $options['PBX_EFFECTUE']    = $options['normal_return_url'];
+        $options['PBX_REFUSE']      = $options['cancel_return_url'];
+        $options['PBX_ANNULE']      = $options['cancel_return_url'];
+        $options['PBX_ATTENTE']     = $options['normal_return_url'];
+        $options['PBX_DIFF']        = $options['bank_delays'];
+
+        if (isset($options['hash_method'])) {
+            $options['PBX_HASH'] = $options['hash_method'];
+        }
+
+        $availableOptionKeys = array(
+            'PBX_SITE',
+            'PBX_RANG',
+            'PBX_IDENTIFIANT',
+            'PBX_TOTAL',
+            'PBX_DEVISE',
+            'PBX_CMD',
+            'PBX_PORTEUR',
+            'PBX_REPONDRE_A',
+            'PBX_RUF1',
+            'PBX_EFFECTUE',
+            'PBX_REFUSE',
+            'PBX_ANNULE',
+            'PBX_ATTENTE',
+            'PBX_RETOUR',
+            'PBX_HASH',
+            'PBX_TIME',
+            'PBX_DIFF',
+            'PBX_TYPEPAIEMENT',
+            'PBX_TYPECARTE',
+            'PBX_ERRORCODETEST'
         );
 
+        foreach ($options as $key => $value) {
+            if (!in_array($key, $availableOptionKeys)) {
+                unset($options[$key]);
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doBuildPaymentOptions(array $options)
+    {
         $msg = implode('&', array_map(
             function ($k, $v) { return sprintf('%s=%s', $k, $v); },
-            array_keys($pbxOptions),
-            $pbxOptions
+            array_keys($options),
+            $options
         ));
 
-        $binKey = file_get_contents($this->getKeyPath($pbxSite));
-        $pbxOptions['PBX_HMAC'] = strtoupper(hash_hmac($parameters['hash_method'], $msg, $binKey));
+        return array(
+            'PBX' => $options,
+            'msg' => $msg
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function buildPaymentForm($builtOptions)
+    {
+        $binKey = file_get_contents($this->getKeyPath($builtOptions['PBX']['PBX_SITE']));
+        $builtOptions['PBX']['PBX_HMAC'] = strtoupper(
+            hash_hmac($builtOptions['PBX']['PBX_HASH'], $builtOptions['msg'], $binKey)
+        );
 
         return $this->twig->render(
             'TmsPaymentBundle:Payment:paybox.html.twig',
             array(
                 'url' => sprintf('https://%s/cgi/MYchoix_pagepaiement.cgi', $this->getAvailableServer()),
-                'PBX' => $pbxOptions,
+                'PBX' => $builtOptions['PBX'],
             )
         );
     }
-    */
 
     /**
      * {@inheritdoc}
