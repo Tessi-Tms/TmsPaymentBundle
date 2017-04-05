@@ -47,7 +47,7 @@ class AtosSipsBinPaymentBackendTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuildPaymentOptions()
     {
-        $builtOptions = $this->paymentBackend->buildPaymentOptions(array(
+        $data = array(
             'merchant_id'            => '014213245611111',
             'merchant_country'       => 'fr',
             'order_id'               => 'order_id',
@@ -58,10 +58,26 @@ class AtosSipsBinPaymentBackendTest extends \PHPUnit_Framework_TestCase
             'automatic_response_url' => 'http://automatic_response_url',
             'cancel_return_url'      => 'http://cancel_return_url',
             'normal_return_url'      => 'http://normal_return_url',
-        ));
+        );
+
+        $builtOptions = $this->paymentBackend->buildPaymentOptions($data);
 
         $this->assertEquals(
-            'amount="100" automatic_response_url="http://automatic_response_url" cancel_return_url="http://cancel_return_url" capture_day="0" capture_mode="AUTHOR_CAPTURE" currency_code="978" customer_email="customer@email.com" merchant_country="fr" merchant_id="014213245611111" normal_return_url="http://normal_return_url" order_id="order_id" pathfile="/var/www/html/Tests/Backend/../Resources/sips/atos/bin/param/pathfile.test"',
+            sprintf(
+                'amount="%d" automatic_response_url="%s" cancel_return_url="%s" capture_day="%d" capture_mode="%s" currency_code="%d" customer_email="%s" merchant_country="%s" merchant_id="%s" normal_return_url="%s" order_id="%s" pathfile="%s"',
+                $data['amount'],
+                $data['automatic_response_url'],
+                $data['cancel_return_url'],
+                0,
+                'AUTHOR_CAPTURE',
+                978,
+                $data['customer_email'],
+                $data['merchant_country'],
+                $data['merchant_id'],
+                $data['normal_return_url'],
+                $data['order_id'],
+                '/var/www/html/Tests/Backend/../Resources/sips/atos/bin/param/pathfile.test'
+            ),
             $builtOptions
         );
     }

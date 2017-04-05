@@ -48,7 +48,7 @@ class AtosSipsSealPaymentBackendTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuildPaymentOptions()
     {
-        $builtOptions = $this->paymentBackend->buildPaymentOptions(array(
+        $data = array(
             'merchant_id'            => '002001000000001',
             'order_id'               => 'order_id',
             'amount'                 => 100,
@@ -56,10 +56,24 @@ class AtosSipsSealPaymentBackendTest extends \PHPUnit_Framework_TestCase
             'bank_delays'            => 0,
             'automatic_response_url' => 'http://automatic_response_url',
             'normal_return_url'      => 'http://normal_return_url',
-        ));
+        );
+
+        $builtOptions = $this->paymentBackend->buildPaymentOptions($data);
 
         $this->assertEquals(
-            'amount=100|automaticResponseUrl=http://automatic_response_url|captureDay=0|captureMode=AUTHOR_CAPTURE|currencyCode=978|merchantId=002001000000001|normalReturnUrl=http://normal_return_url|transactionReference=order_id|keyVersion=1',
+            sprintf(
+                'amount=%s|automaticResponseUrl=%s|captureDay=%d|captureMode=%s|currencyCode=%d|merchantId=%s|normalReturnUrl=%s|orderId=%s|transactionReference=%s|keyVersion=%d',
+                $data['amount'],
+                $data['automatic_response_url'],
+                0,
+                'AUTHOR_CAPTURE',
+                978,
+                $data['merchant_id'],
+                $data['normal_return_url'],
+                $data['order_id'],
+                date('mdHis').$data['order_id'],
+                1
+            ),
             $builtOptions['build']
         );
     }
