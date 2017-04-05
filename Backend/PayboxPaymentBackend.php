@@ -256,15 +256,15 @@ class PayboxPaymentBackend extends AbstractPaymentBackend
      */
     protected function doBuildPaymentOptions(array $options)
     {
-        $msg = implode('&', array_map(
+        $build = implode('&', array_map(
             function ($k, $v) { return sprintf('%s=%s', $k, $v); },
             array_keys($options),
             $options
         ));
 
         return array(
-            'PBX' => $options,
-            'msg' => $msg
+            'options' => $options,
+            'build'   => $build
         );
     }
 
@@ -273,16 +273,16 @@ class PayboxPaymentBackend extends AbstractPaymentBackend
      */
     protected function buildPaymentForm($builtOptions)
     {
-        $binKey = file_get_contents($this->getKeyPath($builtOptions['PBX']['PBX_SITE']));
-        $builtOptions['PBX']['PBX_HMAC'] = strtoupper(
-            hash_hmac($builtOptions['PBX']['PBX_HASH'], $builtOptions['msg'], $binKey)
+        $binKey = file_get_contents($this->getKeyPath($builtOptions['options']['PBX_SITE']));
+        $builtOptions['options']['PBX_HMAC'] = strtoupper(
+            hash_hmac($builtOptions['options']['PBX_HASH'], $builtOptions['build'], $binKey)
         );
 
         return $this->twig->render(
             'TmsPaymentBundle:Payment:paybox.html.twig',
             array(
-                'url' => sprintf('https://%s/cgi/MYchoix_pagepaiement.cgi', $this->getAvailableServer()),
-                'PBX' => $builtOptions['PBX'],
+                'url'     => sprintf('https://%s/cgi/MYchoix_pagepaiement.cgi', $this->getAvailableServer()),
+                'options' => $builtOptions['options'],
             )
         );
     }

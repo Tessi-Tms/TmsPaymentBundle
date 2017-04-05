@@ -65,13 +65,10 @@ class AtosSipsSealPaymentBackend extends AbstractPaymentBackend
         $resolver
             ->setRequired(array(
                 'merchantId',
-                'nationalityCountry',
-                'orderId',
-                'customerEmail',
+                'transactionReference',
                 'amount',
                 'automaticResponseUrl',
                 'normalReturnUrl',
-                'cancelReturnUrl',
             ))
             ->setDefaults(array(
                 'currencyCode' => 'EUR',
@@ -86,12 +83,9 @@ class AtosSipsSealPaymentBackend extends AbstractPaymentBackend
             ->setAllowedTypes(array(
                 'automaticResponseUrl' => array('string'),
                 'normalReturnUrl'      => array('string'),
-                'cancelReturnUrl'      => array('string'),
                 'merchantId'           => array('string'),
-                'nationalityCountry'   => array('string'),
                 'amount'               => array('integer'),
-                'orderId'              => array('string'),
-                'customerEmail'        => array('string'),
+                'transactionReference' => array('string'),
                 'captureDay'           => array('integer'),
             ))
             ->setAllowedValues(array(
@@ -115,23 +109,17 @@ class AtosSipsSealPaymentBackend extends AbstractPaymentBackend
         }
 
         $options['merchantId']           = $options['merchant_id'];
-        $options['nationalityCountry']   = $options['merchant_country'];
         $options['currencyCode']         = $options['currency_code'];
-        $options['orderId']              = $options['order_id'];
-        $options['customerEmail']        = $options['customer_email'];
+        $options['transactionReference'] = $options['order_id'];
         $options['automaticResponseUrl'] = $options['automatic_response_url'];
         $options['normalReturnUrl']      = $options['normal_return_url'];
-        $options['cancelReturnUrl']      = $options['cancel_return_url'];
 
         $availableOptionKeys = array(
             'merchantId',
-            'nationalityCountry',
-            'orderId',
-            'customerEmail',
+            'transactionReference',
             'amount',
             'automaticResponseUrl',
             'normalReturnUrl',
-            'cancelReturnUrl',
             'currencyCode',
             'captureDay',
             'captureMode'
@@ -151,11 +139,21 @@ class AtosSipsSealPaymentBackend extends AbstractPaymentBackend
     {
         ksort($options);
 
-        return implode('|', array_map(
-            function ($k, $v) { return sprintf('%s="%s"', $k, $v); },
+        $keyData = file_get_contents($this->getKeyPath($options['merchantId']));
+        preg_match('/version=(?P<version>\d+)\nsecret=(?P<secret>\w+)/', $keyData, $matches);
+        $options['keyVersion'] = $matches['version'];
+
+        $build = implode('|', array_map(
+            function ($k, $v) { return sprintf('%s=%s', $k, $v); },
             array_keys($options),
             $options
         ));
+
+        return array(
+            'options' => $options,
+            'build'   => $build,
+            'secret'  => $matches['secret']
+        );
     }
 
     /**
@@ -163,15 +161,14 @@ class AtosSipsSealPaymentBackend extends AbstractPaymentBackend
      */
     protected function buildPaymentForm($builtOptions)
     {
-        $secretKey = '002001000000001_KEY1';
-        $seal = hash('sha256', mb_convert_encoding($builtOptions.$secretKey, "UTF-8"));
+        $seal = hash('sha256', mb_convert_encoding($builtOptions['build'].$builtOptions['secret'], "UTF-8"));
 
         return $this->twig->render(
             'TmsPaymentBundle:Payment:atosSipsSeal.html.twig',
             array(
-                'web_server' => $this->getParameter('web_server'),
-                'data'       => $builtOptions,
-                'seal'       => $seal,
+                'url'   => sprintf('https://%s/paymentInit', $this->getParameter('web_server')),
+                'build' => $builtOptions['build'],
+                'seal'  => $seal,
             )
         );
     }

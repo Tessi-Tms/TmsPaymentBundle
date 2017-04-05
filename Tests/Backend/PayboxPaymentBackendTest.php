@@ -60,26 +60,26 @@ class PayboxPaymentBackendTest extends \PHPUnit_Framework_TestCase
             'normal_return_url'      => 'http://normal_return_url',
         ));
 
-        $this->assertEquals('POST', $builtOptions['PBX']['PBX_RUF1']);
+        $this->assertEquals('POST', $builtOptions['options']['PBX_RUF1']);
         $this->assertEquals(
             'amount:M;reference:R;authorisation_id:A;payment_type:P;call:T;subscription:B;card_type:C;card_validity:D;error:E;country:I;bank_country:Y;hash:K',
-            $builtOptions['PBX']['PBX_RETOUR']
+            $builtOptions['options']['PBX_RETOUR']
         );
-        $this->assertEquals(date('c'), $builtOptions['PBX']['PBX_TIME']);
-        $this->assertEquals('CARTE', $builtOptions['PBX']['PBX_TYPEPAIEMENT']);
-        $this->assertEquals('CB', $builtOptions['PBX']['PBX_TYPECARTE']);
-        $this->assertEquals('sha512', $builtOptions['PBX']['PBX_HASH']);
-        $this->assertEquals('1999888', $builtOptions['PBX']['PBX_SITE']);
-        $this->assertEquals('32', $builtOptions['PBX']['PBX_RANG']);
-        $this->assertEquals('110647233', $builtOptions['PBX']['PBX_IDENTIFIANT']);
-        $this->assertEquals(100, $builtOptions['PBX']['PBX_TOTAL']);
-        $this->assertEquals('978', $builtOptions['PBX']['PBX_DEVISE']);
-        $this->assertEquals('customer@email.com', $builtOptions['PBX']['PBX_PORTEUR']);
-        $this->assertEquals('http://automatic_response_url', $builtOptions['PBX']['PBX_REPONDRE_A']);
-        $this->assertEquals('http://normal_return_url', $builtOptions['PBX']['PBX_EFFECTUE']);
-        $this->assertEquals('http://cancel_return_url', $builtOptions['PBX']['PBX_REFUSE']);
-        $this->assertEquals('http://cancel_return_url', $builtOptions['PBX']['PBX_ANNULE']);
-        $this->assertEquals('http://normal_return_url', $builtOptions['PBX']['PBX_ATTENTE']);
-        $this->assertEquals('00', $builtOptions['PBX']['PBX_DIFF']);
+        $this->assertEquals(date('c'), $builtOptions['options']['PBX_TIME']);
+        $this->assertEquals('CARTE', $builtOptions['options']['PBX_TYPEPAIEMENT']);
+        $this->assertEquals('CB', $builtOptions['options']['PBX_TYPECARTE']);
+        $this->assertEquals('sha512', $builtOptions['options']['PBX_HASH']);
+        $this->assertEquals('1999888', $builtOptions['options']['PBX_SITE']);
+        $this->assertEquals('32', $builtOptions['options']['PBX_RANG']);
+        $this->assertEquals('110647233', $builtOptions['options']['PBX_IDENTIFIANT']);
+        $this->assertEquals(100, $builtOptions['options']['PBX_TOTAL']);
+        $this->assertEquals('978', $builtOptions['options']['PBX_DEVISE']);
+        $this->assertEquals('customer@email.com', $builtOptions['options']['PBX_PORTEUR']);
+        $this->assertEquals('http://automatic_response_url', $builtOptions['options']['PBX_REPONDRE_A']);
+        $this->assertEquals('http://normal_return_url', $builtOptions['options']['PBX_EFFECTUE']);
+        $this->assertEquals('http://cancel_return_url', $builtOptions['options']['PBX_REFUSE']);
+        $this->assertEquals('http://cancel_return_url', $builtOptions['options']['PBX_ANNULE']);
+        $this->assertEquals('http://normal_return_url', $builtOptions['options']['PBX_ATTENTE']);
+        $this->assertEquals('00', $builtOptions['options']['PBX_DIFF']);
     }
 }
