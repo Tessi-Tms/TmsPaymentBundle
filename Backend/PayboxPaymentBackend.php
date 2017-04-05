@@ -294,7 +294,7 @@ class PayboxPaymentBackend extends AbstractPaymentBackend
     {
         $requestData = $request->isMethod('POST') ? $request->request : $request->query;
         if (!$requestData->has('error')) {
-            return false;
+            throw new \Exception("The request not contains 'error'");
         }
         $raw  = $requestData->all();
         $code = $raw['error'];

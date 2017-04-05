@@ -46,6 +46,29 @@ class AtosSipsSealPaymentBackend extends AbstractPaymentBackend
         return sprintf('%s/%s.txt', $this->getParameter('keys_path'), $merchantId);
     }
 
+    /**
+     * Returns the key data
+     *
+     * @param string $merchantId The merchant id.
+     *
+     * @return array { 'version': X, 'secret': 'xxx' }
+     */
+    protected function getKeyData($merchantId)
+    {
+        $raw = file_get_contents($this->getKeyPath($merchantId));
+
+        if (0 === preg_match('/version=(?P<version>\d+)\nsecret=(?P<secret>\S+)/', $raw, $matches)) {
+            throw new \Exception(sprintf(
+                "The key file '%s' is not well structured (expected: version=X secret=xxxx)",
+                $this->getKeyPath($merchantId)
+            ));
+        }
+
+        return array(
+            'version' => $matches['version'],
+            'secret'  => $matches['secret']
+        );
+    }
 
     /**
      * {@inheritdoc}
@@ -145,9 +168,9 @@ class AtosSipsSealPaymentBackend extends AbstractPaymentBackend
     {
         ksort($options);
 
-        $keyData = file_get_contents($this->getKeyPath($options['merchantId']));
-        preg_match('/version=(?P<version>\d+)\nsecret=(?P<secret>\w+)/', $keyData, $matches);
-        $options['keyVersion'] = $matches['version'];
+        $keyData = $this->getKeyData($options['merchantId']);
+
+        $options['keyVersion'] = $keyData['version'];
 
         $build = implode('|', array_map(
             function ($k, $v) { return sprintf('%s=%s', $k, $v); },
@@ -158,7 +181,7 @@ class AtosSipsSealPaymentBackend extends AbstractPaymentBackend
         return array(
             'options' => $options,
             'build'   => $build,
-            'secret'  => $matches['secret']
+            'secret'  => $keyData['secret']
         );
     }
 
@@ -184,5 +207,40 @@ class AtosSipsSealPaymentBackend extends AbstractPaymentBackend
      */
     public function doPayment(Request $request, Payment & $payment)
     {
+        if (!$request->request->has('Data')) {
+            throw new \Exception("The request not contains 'Data'");
+        }
+
+        $data    = array();
+        $rawData = explode('|', $request->request->get('Data'));
+
+        foreach ($rawData as $toClean) {
+            if (1 === preg_match('/(?P<key>\S+)=(?P<value>\S+)/', $toClean, $matches)) {
+                $data[$matches['key']] = $matches['value'];
+            }
+        }
+
+        $keyData = $this->getKeyData($data['merchantId']);
+
+        $seal = hash('sha256', $request->request->get('Data').$keyData['secret']);
+
+        if ($request->request->get('Seal') != $seal) {
+            throw new \Exception("Seal check failed");
+        }
+
+        $payment
+            ->setTransactionId($data['transactionReference'])
+            ->setState(Payment::STATE_FAILED)
+            ->setRaw($data)
+        ;
+
+        // Look at documentation for the '17' response code return value.
+        if ('17' === $data['responseCode']) {
+            $payment->setState(Payment::STATE_CANCELED);
+        } elseif ('00' === $data['responseCode']) {
+            $payment->setState(Payment::STATE_APPROVED);
+        }
+
+        return true;
     }
 }

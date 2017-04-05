@@ -62,37 +62,37 @@ class PaymentController extends Controller
         }
 
         $payment = new Payment($order['payment']);
-
-        $paymentBackend->doPayment($request, $payment);
         $response = new Response();
 
-        foreach ($callbacks as $callback => $parameters) {
-            if (null === $parameters || '' == $parameters) {
-                $parameters = array();
-            }
+        try {
+            $paymentBackend->doPayment($request, $payment);
 
-            try {
+            foreach ($callbacks as $callback => $parameters) {
+                if (null === $parameters || '' == $parameters) {
+                    $parameters = array();
+                }
+
                 $this
                     ->container
                     ->get('tms_payment.callback_registry')
                     ->getCallback($callback)
                     ->execute($order, $payment, $parameters)
                 ;
-            } catch (\Exception $e) {
-                $this->container->get('logger')->error(
-                    $e->getMessage(),
-                    array(
-                        'backend' => $backend_alias,
-                        'request' => $request,
-                    )
-                );
-                $response
-                    ->setStatusCode(500, $e->getMessage())
-                    ->setContent($e->getMessage())
-                ;
-
-                return $response;
             }
+        } catch (\Exception $e) {
+            $this->container->get('logger')->error(
+                $e->getMessage(),
+                array(
+                    'backend' => $backend_alias,
+                    'request' => $request,
+                )
+            );
+            $response
+                ->setStatusCode(500, $e->getMessage())
+                ->setContent($e->getMessage())
+            ;
+
+            return $response;
         }
 
         return $response;

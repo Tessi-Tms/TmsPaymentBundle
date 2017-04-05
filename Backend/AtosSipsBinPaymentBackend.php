@@ -147,7 +147,7 @@ class AtosSipsBinPaymentBackend extends AbstractPaymentBackend
     public function doPayment(Request $request, Payment & $payment)
     {
         if (!$request->request->has('DATA')) {
-            return false;
+            throw new \Exception("The request not contains 'DATA'");
         }
 
         $shellOptions = array(
