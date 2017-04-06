@@ -45,11 +45,13 @@ Add parameters:
 ```yml
 # app/config/parameters.yml.dist
 
-payments.logs_dir: /tmp
-payments.sogenactif_pathfile: null
-payments.scellius_pathfile: null
-payments.paybox_keyspath: null
-payments.paybox_web_servers: [preprod-tpeweb.paybox.com]
+payments.logs_dir: "/tmp"
+payments.sogenactif_pathfile: "/var/www/html/vendor/tms/payment-bundle/Tms/Bundle/PaymentBundle/Resources/sips/atos/bin/param/pathfile.sogenactif"
+payments.scellius_pathfile:   "/var/www/html/vendor/tms/payment-bundle/Tms/Bundle/PaymentBundle/sips/atos/bin/param/pathfile.scellius"
+payments.mercanet_keys_path: "/var/www/html/vendor/tms/payment-bundle/Tms/Bundle/PaymentBundle/sips/atos/seal/keys"
+payments.mercanet_web_server: "payment-webinit.mercanet.bnpparibas.net (payment-webinit.simu.mercanet.bnpparibas.net for dev environement)"
+payments.paybox_keys_path:    "/var/www/html/vendor/tms/payment-bundle/Tms/Bundle/PaymentBundle/sips/paybox/keys"
+payments.paybox_web_servers:  "[tpeweb.paybox.com, tpeweb1.paybox.com] ([preprod-tpeweb.paybox.com] for dev environement)"
 ```
 
 To check if every thing seem to be ok, you can execute this command:
