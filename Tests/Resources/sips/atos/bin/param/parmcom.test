@@ -1,16 +1,13 @@
 ###############################################################################
 #
-#	Fichier des parametres Sogenactif paiement
-#
-#	Remarque :	Ce fichier paramètre est sous la responsabilité de la
-#				Societe Generale
+#	Fichier des parametres Test paiement
 #
 ###############################################################################
 
 
-# Logo de la Societe Generale
+# Logo
 
-ADVERT!sg.gif!
+ADVERT!logo.gif!
 
 # couleur du fond d'ecran (blanc)
 
@@ -40,9 +37,9 @@ HEADER_FLAG!yes!
 
 LANGUAGE!fr!
 
-# Logo Interactis paiement
+# Logo paiement
 
-LOGO2!sogenactif.gif!
+LOGO2!pay_logo.gif!
 
 # Code pays du commercant
 

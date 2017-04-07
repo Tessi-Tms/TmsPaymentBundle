@@ -1,5 +1,5 @@
 DEBUG!NO!
-F_CERTIFICATE!./Tests/bin/sips/param/certif!
+F_CERTIFICATE!../vendor/tms/payment-bundle/Tms/Bundle/PaymentBundle/Resources/sips/atos/bin/param/certif!
 F_CTYPE!php!
-F_PARAM!./Tests/bin/sips/param/parmcom!
-F_DEFAULT!./Tests/bin/sips/param/parmcom.sogenactif!
+F_PARAM!../vendor/tms/payment-bundle/Tms/Bundle/PaymentBundle/Resources/sips/atos/bin/param/parmcom!
+F_DEFAULT!../vendor/tms/payment-bundle/Tms/Bundle/PaymentBundle/Resources/sips/atos/bin/param/parmcom.sogenactif!
