@@ -176,7 +176,7 @@ class PayboxPaymentBackend extends AbstractPaymentBackend
                     'ripemd160',
                     'mdc2',
                 ),
-                'PBX_DEVISE' => CurrencyCode::getAlphabeticCodes(),
+                //'PBX_DEVISE' => CurrencyCode::getAlphabeticCodes(),
             ))
             ->setAllowedTypes(array(
                 'PBX_SITE'        => array('string'),

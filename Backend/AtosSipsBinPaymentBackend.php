@@ -64,7 +64,7 @@ class AtosSipsBinPaymentBackend extends AbstractPaymentBackend
                 'capture_day'            => array('integer'),
             ))
             ->setAllowedValues(array(
-                'currency_code' => CurrencyCode::getAlphabeticCodes(),
+                //'currency_code' => CurrencyCode::getAlphabeticCodes(),
                 'capture_mode'  => array('AUTHOR_CAPTURE', 'VALIDATION'),
             ))
         ;
