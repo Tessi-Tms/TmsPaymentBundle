@@ -191,7 +191,7 @@ class PayboxPaymentBackend extends AbstractPaymentBackend
                 'PBX_REFUSE'      => array('string'),
                 'PBX_ANNULE'      => array('string'),
                 'PBX_ATTENTE'     => array('string'),
-                'PBX_DIFF'        => array('integer'),
+                'PBX_DIFF'        => array('string', 'integer'),
             ))
         ;
     }

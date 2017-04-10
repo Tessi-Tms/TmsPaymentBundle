@@ -113,7 +113,7 @@ class AtosSipsSealPaymentBackend extends AbstractPaymentBackend
                 'merchantId'           => array('string'),
                 'amount'               => array('integer'),
                 'orderId'              => array('string'),
-                'transactionReference' => array('null'),
+                'transactionReference' => array('string', 'null'),
                 'captureDay'           => array('integer'),
             ))
             ->setAllowedValues(array(
