@@ -235,12 +235,16 @@ class AtosSipsSealPaymentBackend extends AbstractPaymentBackend
         ;
 
         // Look at documentation for the '17' response code return value.
-        if ('17' === $data['responseCode']) {
-            $payment->setState(Payment::STATE_CANCELED);
-        } elseif ('00' === $data['responseCode']) {
+        if ('00' === $data['responseCode']) {
             $payment->setState(Payment::STATE_APPROVED);
+
+            return true;
         }
 
-        return true;
+        if ('17' === $data['responseCode']) {
+            $payment->setState(Payment::STATE_CANCELED);
+        }
+
+        return false;
     }
 }

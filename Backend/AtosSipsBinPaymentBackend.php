@@ -228,12 +228,17 @@ class AtosSipsBinPaymentBackend extends AbstractPaymentBackend
         ;
 
         // Look at documentation for the '17' response code return value.
-        if ($raw['response_code'] == '17') {
-            $payment->setState(Payment::STATE_CANCELED);
-        } elseif ('0' === $raw['code'] && '00' === $raw['response_code']) {
+        if ('0' === $raw['code'] && '00' === $raw['response_code']) {
             $payment->setState(Payment::STATE_APPROVED);
+
+            return true;
         }
 
-        return true;
+        if ('17' == $raw['response_code']) {
+            $payment->setState(Payment::STATE_CANCELED);
+
+        }
+
+        return false;
     }
 }

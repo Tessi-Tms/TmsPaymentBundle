@@ -65,19 +65,19 @@ class PaymentController extends Controller
         $response = new Response();
 
         try {
-            $paymentBackend->doPayment($request, $payment);
+            if ($paymentBackend->doPayment($request, $payment)) {
+                foreach ($callbacks as $callback => $parameters) {
+                    if (null === $parameters || '' == $parameters) {
+                        $parameters = array();
+                    }
 
-            foreach ($callbacks as $callback => $parameters) {
-                if (null === $parameters || '' == $parameters) {
-                    $parameters = array();
+                    $this
+                        ->container
+                        ->get('tms_payment.callback_registry')
+                        ->getCallback($callback)
+                        ->execute($order, $payment, $parameters)
+                    ;
                 }
-
-                $this
-                    ->container
-                    ->get('tms_payment.callback_registry')
-                    ->getCallback($callback)
-                    ->execute($order, $payment, $parameters)
-                ;
             }
         } catch (\Exception $e) {
             $this->container->get('logger')->error(

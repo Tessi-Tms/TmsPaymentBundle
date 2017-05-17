@@ -3,6 +3,8 @@
 namespace Tms\Bundle\PaymentBundle\Tests\Backend;
 
 use Tms\Bundle\PaymentBundle\Backend\PayboxPaymentBackend;
+use Symfony\Component\HttpFoundation\Request;
+use Tms\Bundle\PaymentBundle\Model\Payment;
 
 class PayboxPaymentBackendTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,15 +33,77 @@ class PayboxPaymentBackendTest extends \PHPUnit_Framework_TestCase
      */
     public function testDoPayment()
     {
-        /**
-        * Do the payment process
-        *
-        * @param Request $request The HTTP request.
-        * @param Payment $payment The payment.
-        *
-        * @return boolean
-        public function doPayment(Request $request, Payment & $payment);
-        */
+        // Without error data
+        $payment = new Payment();
+        $request = Request::create(
+            'tms-payment.test/payment/paybox/autoresponse',
+            'POST'
+        );
+
+        try {
+            $this->paymentBackend->doPayment($request, $payment);
+            $this->fail("Expected exception not thrown");
+        } catch(\Exception $e) {
+            $this->assertEquals("The request not contains 'error'", $e->getMessage());
+        }
+
+        // Valid payment
+        $payment = new Payment();
+        $request = Request::create(
+            'tms-payment.test/payment/paybox/autoresponse',
+            'POST',
+            array(
+                'error'     => '00000',
+                'reference' => 'dummy',
+            )
+        );
+
+        try {
+            $isValid = $this->paymentBackend->doPayment($request, $payment);
+        } catch(\Exception $e) {
+            $this->fail("Exception not expected thrown");
+        }
+        $this->assertTrue($isValid);
+        $this->assertEquals($payment->getState(), Payment::STATE_APPROVED);
+
+
+        // Canceled payment
+        $payment = new Payment();
+        $request = Request::create(
+            'tms-payment.test/payment/paybox/autoresponse',
+            'POST',
+            array(
+                'error'     => '00001',
+                'reference' => 'dummy',
+            )
+        );
+
+        try {
+            $isValid = $this->paymentBackend->doPayment($request, $payment);
+        } catch(\Exception $e) {
+            $this->fail("Exception not expected thrown");
+        }
+        $this->assertFalse($isValid);
+        $this->assertEquals($payment->getState(), Payment::STATE_CANCELED);
+
+
+        // Failed payment
+        $request = Request::create(
+            'tms-payment.test/payment/paybox/autoresponse',
+            'POST',
+            array(
+                'error'     => '001',
+                'reference' => 'dummy',
+            )
+        );
+
+        try {
+            $isValid = $this->paymentBackend->doPayment($request, $payment);
+        } catch(\Exception $e) {
+            $this->fail("Exception not expected thrown");
+        }
+        $this->assertFalse($isValid);
+        $this->assertEquals($payment->getState(), Payment::STATE_FAILED);
     }
 
     /**

@@ -307,14 +307,18 @@ class PayboxPaymentBackend extends AbstractPaymentBackend
         ;
 
         // Look at paybox documentation for the PBX_RETOUR variable.
+        if ('00000' === $code) {
+            $payment->setState(Payment::STATE_APPROVED);
+
+            return true;
+        }
+
         if ('00001' === $code) {
             $payment->setState(Payment::STATE_CANCELED);
-        } elseif ('00000' === $code) {
-            $payment->setState(Payment::STATE_APPROVED);
         } elseif ('001' == substr($code, 0, 3)) {
             $payment->setState(Payment::STATE_FAILED);
         }
 
-        return true;
+        return false;
     }
 }

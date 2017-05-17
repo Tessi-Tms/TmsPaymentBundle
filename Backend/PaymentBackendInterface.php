@@ -25,7 +25,7 @@ interface PaymentBackendInterface
      * @param Request $request The HTTP request.
      * @param Payment $payment The payment.
      *
-     * @return boolean
+     * @return boolean True if the payment is valid, false otherwise.
      */
     public function doPayment(Request $request, Payment & $payment);
 
