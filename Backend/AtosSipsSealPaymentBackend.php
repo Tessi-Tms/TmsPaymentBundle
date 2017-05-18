@@ -247,4 +247,12 @@ class AtosSipsSealPaymentBackend extends AbstractPaymentBackend
 
         return false;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function checkUserRequestFromBank(Request $request)
+    {
+        return $this->doPayment($request, new Payment());
+    }
 }

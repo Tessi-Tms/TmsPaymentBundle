@@ -79,6 +79,14 @@ abstract class AbstractPaymentBackend implements PaymentBackendInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function checkUserRequestFromBank(Request $request)
+    {
+        return true;
+    }
+
+    /**
      * Build payment options.
      *
      * @param array $options

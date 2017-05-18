@@ -30,6 +30,15 @@ interface PaymentBackendInterface
     public function doPayment(Request $request, Payment & $payment);
 
     /**
+     * Check the user request once back from the bank.
+     *
+     * @param Request $request The HTTP request.
+     *
+     * @return boolean True if the payment is valid, false otherwise.
+     */
+    public function checkUserRequestFromBank(Request $request);
+
+    /**
      * Returns the HTML payment form.
      *
      * @param array $options The payment options.
@@ -37,4 +46,6 @@ interface PaymentBackendInterface
      * @return string
      */
     public function getPaymentForm(array $options);
+
+
 }
