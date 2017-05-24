@@ -94,10 +94,11 @@ class AtosSipsSealPaymentBackend extends AbstractPaymentBackend
                 'normalReturnUrl',
             ))
             ->setDefaults(array(
-                'transactionReference' => null,
-                'currencyCode'         => 'EUR',
-                'captureDay'           => 0,
-                'captureMode'          => 'AUTHOR_CAPTURE',
+                'transactionReference'          => null,
+                'currencyCode'                  => 'EUR',
+                'captureDay'                    => 0,
+                'captureMode'                   => 'AUTHOR_CAPTURE',
+                'paypageData.bypassReceiptPage' => 'Y',
             ))
             ->setNormalizers(array(
                 'transactionReference' => function(Options $options, $value) {
