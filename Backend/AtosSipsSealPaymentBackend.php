@@ -92,6 +92,7 @@ class AtosSipsSealPaymentBackend extends AbstractPaymentBackend
                 'amount',
                 'automaticResponseUrl',
                 'normalReturnUrl',
+                'customerContact.email',
             ))
             ->setDefaults(array(
                 'transactionReference'          => null,
@@ -109,13 +110,14 @@ class AtosSipsSealPaymentBackend extends AbstractPaymentBackend
                 },
             ))
             ->setAllowedTypes(array(
-                'automaticResponseUrl' => array('string'),
-                'normalReturnUrl'      => array('string'),
-                'merchantId'           => array('string'),
-                'amount'               => array('integer'),
-                'orderId'              => array('string'),
-                'transactionReference' => array('string', 'null'),
-                'captureDay'           => array('integer'),
+                'merchantId'            => array('string'),
+                'orderId'               => array('string'),
+                'amount'                => array('integer'),
+                'automaticResponseUrl'  => array('string'),
+                'normalReturnUrl'       => array('string'),
+                'customerContact.email' => array('string'),
+                'transactionReference'  => array('string', 'null'),
+                'captureDay'            => array('integer'),
             ))
             ->setAllowedValues(array(
                 //'currencyCode' => CurrencyCode::getAlphabeticCodes(),
@@ -137,19 +139,21 @@ class AtosSipsSealPaymentBackend extends AbstractPaymentBackend
             $options['captureMode'] = $options['capture_mode'];
         }
 
-        $options['merchantId']           = $options['merchant_id'];
-        $options['currencyCode']         = $options['currency_code'];
-        $options['orderId']              = $options['order_id'];
-        $options['automaticResponseUrl'] = $options['automatic_response_url'];
-        $options['normalReturnUrl']      = $options['normal_return_url'];
+        $options['merchantId']            = $options['merchant_id'];
+        $options['orderId']               = $options['order_id'];
+        $options['currencyCode']          = $options['currency_code'];
+        $options['automaticResponseUrl']  = $options['automatic_response_url'];
+        $options['normalReturnUrl']       = $options['normal_return_url'];
+        $options['customerContact.email'] = $options['customer_email'];
 
         $availableOptionKeys = array(
             'merchantId',
             'orderId',
-            'transactionReference',
             'amount',
             'automaticResponseUrl',
             'normalReturnUrl',
+            'customerContact.email',
+            'transactionReference',
             'currencyCode',
             'captureDay',
             'captureMode'
