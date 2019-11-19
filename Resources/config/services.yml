@@ -49,7 +49,7 @@ services:
         class: Tms\Bundle\PaymentBundle\Backend\AtosSipsSealPaymentBackend
         arguments:
             - { keys_path: "%payments.mercanet_keys_path%", web_server: "%payments.mercanet_web_server%" }
-            - @twig
+            - "@twig"
         tags:
             - { name: tms_payment.backend, alias: mercanet }
 
@@ -57,7 +57,7 @@ services:
         class: Tms\Bundle\PaymentBundle\Backend\PayboxPaymentBackend
         arguments:
             - { keys_path: "%payments.paybox_keys_path%", web_servers: "%payments.paybox_web_servers%" }
-            - @twig
+            - "@twig"
         tags:
             - { name: tms_payment.backend, alias: paybox }
 
