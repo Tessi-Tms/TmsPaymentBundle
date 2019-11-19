@@ -6,12 +6,12 @@ services:
         class: Symfony\Bridge\Monolog\Logger
         arguments: [tms_payment]
         calls:
-            - [pushHandler, [@tms_payment.logger_handler]]
+            - [pushHandler, ["@tms_payment.logger_handler"]]
 
     tms_payment.logger_handler:
         class: Monolog\Handler\StreamHandler
         # DEBUG:100, INFO:200, NOTICE:250, WARNING:300, ERROR:400, CRITICAL:500, ALERT:550, EMERGENCY:600
-        arguments: [%payments.logs_dir%/autoresponse_%kernel.environment%.log, 100]
+        arguments: ["%payments.logs_dir%/autoresponse_%kernel.environment%.log", 100]
 
 
     # Registry
@@ -29,7 +29,7 @@ services:
         class: Tms\Bundle\PaymentBundle\Backend\AtosSipsBinPaymentBackend
         arguments:
             -
-                pathfile: %payments.sogenactif_pathfile%
+                pathfile: "%payments.sogenactif_pathfile%"
                 request_bin_path: "@=service('kernel').locateResource('@TmsPaymentBundle/Resources/sips/atos/bin/static/request')"
                 response_bin_path: "@=service('kernel').locateResource('@TmsPaymentBundle/Resources/sips/atos/bin/static/response')"
         tags:
@@ -39,7 +39,7 @@ services:
         class: Tms\Bundle\PaymentBundle\Backend\AtosSipsBinPaymentBackend
         arguments:
             -
-                pathfile: %payments.scellius_pathfile%
+                pathfile: "%payments.scellius_pathfile%"
                 request_bin_path: "@=service('kernel').locateResource('@TmsPaymentBundle/Resources/sips/atos/bin/static/request')"
                 response_bin_path: "@=service('kernel').locateResource('@TmsPaymentBundle/Resources/sips/atos/bin/static/response')"
         tags:
@@ -48,7 +48,7 @@ services:
     tms_payment.backend.mercanet:
         class: Tms\Bundle\PaymentBundle\Backend\AtosSipsSealPaymentBackend
         arguments:
-            - { keys_path: %payments.mercanet_keys_path%, web_server: %payments.mercanet_web_server% }
+            - { keys_path: "%payments.mercanet_keys_path%", web_server: "%payments.mercanet_web_server%" }
             - @twig
         tags:
             - { name: tms_payment.backend, alias: mercanet }
@@ -56,7 +56,7 @@ services:
     tms_payment.backend.paybox:
         class: Tms\Bundle\PaymentBundle\Backend\PayboxPaymentBackend
         arguments:
-            - { keys_path: %payments.paybox_keys_path%, web_servers: %payments.paybox_web_servers% }
+            - { keys_path: "%payments.paybox_keys_path%", web_servers: "%payments.paybox_web_servers%" }
             - @twig
         tags:
             - { name: tms_payment.backend, alias: paybox }
@@ -66,12 +66,12 @@ services:
 
     tms_payment.callback.update_order:
         class: Tms\Bundle\PaymentBundle\Callback\UpdateOrderPaymentCallback
-        arguments: [@tms_rest_client.hypermedia.crawler]
+        arguments: ["@tms_rest_client.hypermedia.crawler"]
         tags:
             - { name: tms_payment.callback, alias: update_order }
 
     tms_payment.callback.create_participation:
         class: Tms\Bundle\PaymentBundle\Callback\CreateParticipationPaymentCallback
-        arguments: [@tms_rest_client.hypermedia.crawler]
+        arguments: ["@tms_rest_client.hypermedia.crawler"]
         tags:
             - { name: tms_payment.callback, alias: create_participation }
