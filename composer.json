@@ -26,7 +26,7 @@
     },
     "require-dev": {
       "phpunit/phpunit": "~5.7",
-      "symfony/symfony": "2.7.*"
+      "symfony/symfony": "~2.8"
     },
     "autoload": {
         "psr-0": { "Tms\\Bundle\\PaymentBundle": "" }
