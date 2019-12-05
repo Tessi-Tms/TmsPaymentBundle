@@ -127,9 +127,9 @@ abstract class AbstractPaymentBackend implements PaymentBackendInterface
     /**
      * Configure options.
      *
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
-    abstract protected function configureOptions(OptionsResolverInterface $resolver);
+    abstract protected function configureOptions(OptionsResolver $resolver);
 
     /**
      * Do build payment options.
@@ -143,9 +143,9 @@ abstract class AbstractPaymentBackend implements PaymentBackendInterface
     /**
      * Configure parameters.
      *
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
-    abstract protected function configureParameters(OptionsResolverInterface $resolver);
+    abstract protected function configureParameters(OptionsResolver $resolver);
 
     /**
      * Build payment form.
