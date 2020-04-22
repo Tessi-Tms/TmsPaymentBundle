@@ -6,7 +6,7 @@ services:
         class: Symfony\Bridge\Monolog\Logger
         arguments: [tms_payment]
         calls:
-            - [pushHandler, ["@tms_payment.logger_handler"]]
+            - ['pushHandler', ["@tms_payment.logger_handler"]]
 
     tms_payment.logger_handler:
         class: Monolog\Handler\StreamHandler
