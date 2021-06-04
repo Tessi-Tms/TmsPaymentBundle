@@ -7,12 +7,12 @@
 
 namespace Tms\Bundle\PaymentBundle\Backend;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Process\Process;
 use Symfony\Component\HttpFoundation\Request;
-use Tms\Bundle\PaymentBundle\Model\Payment;
 use Tms\Bundle\PaymentBundle\Currency\CurrencyCode;
+use Tms\Bundle\PaymentBundle\Model\Payment;
 
 class AtosSipsSealPaymentBackend extends AbstractPaymentBackend
 {
@@ -73,7 +73,7 @@ class AtosSipsSealPaymentBackend extends AbstractPaymentBackend
     /**
      * {@inheritdoc}
      */
-    protected function configureParameters(OptionsResolverInterface $resolver)
+    protected function configureParameters(OptionsResolver $resolver)
     {
         $resolver
             ->setRequired(array('keys_path', 'web_server'))
@@ -83,7 +83,7 @@ class AtosSipsSealPaymentBackend extends AbstractPaymentBackend
     /**
      * {@inheritdoc}
      */
-    protected function configureOptions(OptionsResolverInterface $resolver)
+    protected function configureOptions(OptionsResolver $resolver)
     {
         $resolver
             ->setRequired(array(
